@@ -162,7 +162,7 @@ body {
 .routine-name { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .routine-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .routine-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
-.routine-start-btn { height: 32px; padding: 0 14px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.routine-start-btn { height: 32px; padding: 0 14px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
 .routine-edit-btn, .routine-del-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: transparent; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
 .routine-edit-btn { color: var(--text); }
 .routine-del-btn { border-color: rgba(255,92,92,0.3); color: var(--danger); }
