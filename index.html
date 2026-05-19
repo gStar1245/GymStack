@@ -88,6 +88,7 @@
 
   <!-- ══ 기록 탭 ══════════════════════════════════════ -->
   <div id="historyTab" style="display:none;">
+    <div class="section-label" style="margin-bottom:10px;">대시보드</div>
     <div class="stat-cards">
       <div class="stat-card">
         <div class="stat-value" id="statStreak">0</div>
@@ -107,13 +108,17 @@
       </div>
     </div>
 
+    <div class="section-label" style="margin:14px 0 10px;">차트</div>
     <div class="chart-tabs">
       <button class="chart-tab active" data-mode="week">이번 주</button>
       <button class="chart-tab" data-mode="month">최근 30일</button>
     </div>
     <div id="chartContainer"></div>
 
-    <div class="section-label" style="margin-bottom:8px;">운동 기록</div>
+    <div class="list-title-row" style="margin-top:14px;margin-bottom:8px;">
+      <div class="section-label" style="margin:0;">운동 기록</div>
+      <button class="history-clear-btn" onclick="HistoryUI.clearHistory()">초기화</button>
+    </div>
     <div id="historyList"></div>
   </div>
 

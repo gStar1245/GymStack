@@ -181,5 +181,11 @@ const HistoryUI = (() => {
     return (d.getMonth()+1) + '월 ' + d.getDate() + '일 (' + days[d.getDay()] + ')';
   }
 
-  return { render, renderChart, closeRecordDetail };
+  function clearHistory() {
+    if (!confirm('운동 기록을 모두 삭제할까요?\n이 작업은 되돌릴 수 없습니다.')) return;
+    lsSet('v2_history', []);
+    render();
+  }
+
+  return { render, renderChart, closeRecordDetail, clearHistory };
 })();

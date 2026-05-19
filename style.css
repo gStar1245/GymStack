@@ -208,6 +208,9 @@ body {
 
 #chartContainer { background: var(--surface); border-radius: 12px; border: 1px solid var(--border); padding: 8px; margin-bottom: 1rem; min-height: 170px; }
 
+.history-clear-btn { padding: 4px 10px; border-radius: 7px; border: 1px solid rgba(255,92,92,0.35); background: transparent; color: var(--danger); font-size: 12px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.history-clear-btn:active { background: rgba(255,92,92,0.08); }
+
 .history-date-header { font-size: 13px; font-weight: 600; color: var(--muted); margin: 12px 0 6px; }
 .history-item {
   background: var(--surface); border-radius: 12px; border: 1px solid var(--border);
