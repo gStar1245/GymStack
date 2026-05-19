@@ -162,7 +162,6 @@ const TimerUI = (() => {
     renderDots(ex);
     renderTimerCard(ex);
     renderExList();
-    renderSetInputs(ex);
   }
 
   function renderDots(ex) {
@@ -227,23 +226,6 @@ const TimerUI = (() => {
       item.onclick = () => { Session.exIdx = i; render(); };
       list.appendChild(item);
     });
-  }
-
-  function renderSetInputs(ex) {
-    const wrap = document.getElementById('setInputWrap');
-    if (!wrap) return;
-    wrap.innerHTML = '';
-    if (ex.setsCompleted < ex.sets && !Session.resting) {
-      const row = document.createElement('div');
-      row.className = 'set-input-row';
-      row.innerHTML =
-        '<input type="number" id="weightInput" min="0" step="0.5" placeholder="kg" value="' + (ex.weight || '') + '">' +
-        '<span>×</span>' +
-        '<input type="number" id="repsInput" min="1" step="1" placeholder="회" value="' + (ex.reps || '') + '">';
-      row.querySelector('#weightInput').addEventListener('change', e => { ex.weight = parseFloat(e.target.value) || 0; });
-      row.querySelector('#repsInput').addEventListener('change', e => { ex.reps = parseInt(e.target.value) || 0; });
-      wrap.appendChild(row);
-    }
   }
 
   function showDone() {

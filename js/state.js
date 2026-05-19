@@ -50,8 +50,6 @@ const Settings = {
   set restDuration(v) { lsSet('v2_rest', v); },
   get soundEnabled() { return lsGet('v2_sound', true); },
   set soundEnabled(v) { lsSet('v2_sound', v); },
-  get claudeApiKey() { return lsGet('v2_claude_key', ''); },
-  set claudeApiKey(v) { lsSet('v2_claude_key', v); },
 };
 
 // ── 루틴 저장소 ───────────────────────────────────────

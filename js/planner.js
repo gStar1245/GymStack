@@ -1,6 +1,38 @@
 // ── 플래너 모듈 ───────────────────────────────────────
 const Planner = (() => {
   let editRoutine = null; // 현재 편집 중인 루틴
+  let dragSrcIdx = null;
+  let touchSrcIdx = null;
+
+  // ── 터치 드래그 (문서 레벨, 1회만 등록) ──────────────
+  document.addEventListener('touchmove', e => {
+    if (touchSrcIdx === null) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const list = document.getElementById('editorExList');
+    if (!list) return;
+    list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const target = els.find(el => el.classList?.contains('editor-ex-item') && parseInt(el.dataset.idx) !== touchSrcIdx);
+    if (target) target.classList.add('drag-over');
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (touchSrcIdx === null) return;
+    const list = document.getElementById('editorExList');
+    if (!list) return;
+    list.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+    const overEl = list.querySelector('.drag-over');
+    if (overEl) {
+      const dstIdx = parseInt(overEl.dataset.idx);
+      if (dstIdx !== touchSrcIdx) {
+        const moved = editRoutine.exercises.splice(touchSrcIdx, 1)[0];
+        editRoutine.exercises.splice(dstIdx, 0, moved);
+      }
+    }
+    touchSrcIdx = null;
+    renderEditorExList();
+  });
 
   // ── 루틴 목록 렌더링 ────────────────────────────────
   function renderRoutineList() {
@@ -89,24 +121,53 @@ const Planner = (() => {
     editRoutine.exercises.forEach((ex, i) => {
       const item = document.createElement('div');
       item.className = 'editor-ex-item';
+      item.draggable = true;
+      item.dataset.idx = String(i);
       item.innerHTML =
+        '<span class="drag-handle" title="드래그하여 순서 변경">⠿</span>' +
         '<span class="editor-ex-num">' + (i+1) + '</span>' +
         '<input class="editor-ex-name" type="text" value="' + ex.name + '" placeholder="종목명">' +
         '<input class="editor-ex-sets" type="number" min="1" max="10" value="' + ex.sets + '" title="세트 수">' +
         '<span class="editor-ex-sets-label">세트</span>' +
-        '<div class="sheet-move-btns">' +
-          '<button class="sheet-move-btn" ' + (i===0?'disabled':'') + '>▲</button>' +
-          '<button class="sheet-move-btn" ' + (i===editRoutine.exercises.length-1?'disabled':'') + '>▼</button>' +
-        '</div>' +
         '<button class="sheet-del-btn">×</button>';
+
       const nameInput = item.querySelector('.editor-ex-name');
       nameInput.oninput = () => { editRoutine.exercises[i].name = nameInput.value; };
       const setsInput = item.querySelector('.editor-ex-sets');
       setsInput.oninput = () => { editRoutine.exercises[i].sets = parseInt(setsInput.value) || 1; };
-      const [upBtn, dnBtn] = item.querySelectorAll('.sheet-move-btn');
-      upBtn.onclick = () => { [editRoutine.exercises[i-1], editRoutine.exercises[i]] = [editRoutine.exercises[i], editRoutine.exercises[i-1]]; renderEditorExList(); };
-      dnBtn.onclick = () => { [editRoutine.exercises[i], editRoutine.exercises[i+1]] = [editRoutine.exercises[i+1], editRoutine.exercises[i]]; renderEditorExList(); };
       item.querySelector('.sheet-del-btn').onclick = () => { editRoutine.exercises.splice(i, 1); renderEditorExList(); };
+
+      // ── 데스크탑 드래그 ──
+      item.addEventListener('dragstart', e => {
+        dragSrcIdx = i;
+        e.dataTransfer.effectAllowed = 'move';
+        requestAnimationFrame(() => item.classList.add('dragging'));
+      });
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      });
+      item.addEventListener('dragover', e => {
+        e.preventDefault();
+        list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        item.classList.add('drag-over');
+      });
+      item.addEventListener('drop', e => {
+        e.preventDefault();
+        if (dragSrcIdx === null || dragSrcIdx === i) return;
+        const moved = editRoutine.exercises.splice(dragSrcIdx, 1)[0];
+        editRoutine.exercises.splice(i, 0, moved);
+        dragSrcIdx = null;
+        renderEditorExList();
+      });
+
+      // ── 모바일 터치 드래그 핸들 ──
+      item.querySelector('.drag-handle').addEventListener('touchstart', e => {
+        touchSrcIdx = i;
+        item.classList.add('dragging');
+        e.preventDefault();
+      }, { passive: false });
+
       list.appendChild(item);
     });
   }
@@ -152,55 +213,6 @@ const Planner = (() => {
     msg.className = 'planner-msg ok';
   }
 
-  // ── Claude AI 플래너 ────────────────────────────────
-  async function callClaudePlanner() {
-    const btn = document.getElementById('aiPlanBtn');
-    const prompt = document.getElementById('aiPromptInput').value.trim();
-    const msg = document.getElementById('aiMsg');
-    const apiKey = Settings.claudeApiKey;
-
-    if (!apiKey) { msg.textContent = '설정에서 Claude API 키를 입력해주세요.'; msg.className = 'planner-msg err'; return; }
-    if (!prompt) { msg.textContent = '운동 요청을 입력해주세요. (예: 상체 덤벨 30분)'; msg.className = 'planner-msg err'; return; }
-
-    btn.disabled = true; btn.textContent = '생성 중...';
-    msg.textContent = ''; msg.className = 'planner-msg';
-
-    const systemPrompt = `당신은 운동 전문가입니다. 사용자의 요청에 맞는 운동 루틴을 다음 JSON 형식으로만 응답하세요.
-{"label":"루틴 이름","exercises":[{"name":"종목명","sets":3},...]}`
-
-    try {
-      const resp = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 512,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: prompt }],
-        }),
-      });
-      if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}));
-        throw new Error(err.error?.message || resp.statusText);
-      }
-      const data = await resp.json();
-      const text = data.content?.[0]?.text || '';
-      const match = text.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error('JSON 파싱 실패');
-      document.getElementById('plannerInput').value = match[0];
-      loadPlannerJSON();
-    } catch (e) {
-      msg.textContent = '오류: ' + e.message; msg.className = 'planner-msg err';
-    } finally {
-      btn.disabled = false; btn.textContent = 'AI 루틴 생성';
-    }
-  }
-
   // ── 바텀시트 헬퍼 ──────────────────────────────────
   function openSheet(id) {
     document.getElementById(id + 'Overlay').classList.add('open');
@@ -224,7 +236,7 @@ const Planner = (() => {
   return {
     renderRoutineList, renderTemplateList,
     openRoutineEditor, saveEditRoutine, addEditorEx, applyToSession,
-    loadPlannerJSON, callClaudePlanner,
+    loadPlannerJSON,
     openSheet, closeSheet,
   };
 })();

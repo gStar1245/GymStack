@@ -34,11 +34,6 @@ const App = (() => {
     soundToggle.checked = Settings.soundEnabled;
     soundToggle.addEventListener('change', () => { Settings.soundEnabled = soundToggle.checked; });
 
-    // API 키 설정
-    const apiKeyInput = document.getElementById('apiKeyInput');
-    apiKeyInput.value = Settings.claudeApiKey;
-    apiKeyInput.addEventListener('change', () => { Settings.claudeApiKey = apiKeyInput.value.trim(); });
-
     // 테마 버튼
     document.getElementById('themeDark').addEventListener('click', () => applyTheme('dark'));
     document.getElementById('themeLight').addEventListener('click', () => applyTheme('light'));
@@ -69,9 +64,6 @@ const App = (() => {
 
     // 플래너 JSON 불러오기
     document.getElementById('plannerLoadBtn')?.addEventListener('click', Planner.loadPlannerJSON);
-
-    // AI 플래너
-    document.getElementById('aiPlanBtn')?.addEventListener('click', Planner.callClaudePlanner);
 
     // 루틴 에디터
     document.getElementById('saveRoutineBtn')?.addEventListener('click', Planner.saveEditRoutine);
