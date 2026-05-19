@@ -3,213 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>운동 타이머</title>
+<title>GymStack V2</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='26' width='10' height='12' rx='3' fill='%234f9eff'/%3E%3Crect x='50' y='26' width='10' height='12' rx='3' fill='%234f9eff'/%3E%3Crect x='12' y='20' width='8' height='24' rx='3' fill='%234f9eff'/%3E%3Crect x='44' y='20' width='8' height='24' rx='3' fill='%234f9eff'/%3E%3Crect x='20' y='29' width='24' height='6' rx='3' fill='%234f9eff'/%3E%3C/svg%3E">
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424;
-  --border: rgba(255,255,255,0.1); --text: #f0f0f0; --muted: #888;
-  --accent: #4f9eff; --success: #3ecf8e; --rest: #f5a623; --danger: #ff5c5c;
-}
-:root.light {
-  --bg: #f5f5f5; --surface: #ffffff; --surface2: #ebebeb;
-  --border: rgba(0,0,0,0.1); --text: #1a1a1a; --muted: #888;
-  --accent: #2b7fff; --success: #1aab6d; --rest: #d4870a; --danger: #e03e3e;
-}
-html { overflow-y: scroll; }
-body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic Neo','Noto Sans KR',sans-serif; min-height: 100vh; padding: 1rem; -webkit-tap-highlight-color: transparent; transition: background 0.2s, color 0.2s; }
-.wrap { max-width: 480px; margin: 0 auto; }
-
-.tabs { display: flex; gap: 4px; margin-bottom: 1.2rem; background: var(--surface); border-radius: 10px; padding: 4px; }
-.tab { flex: 1; padding: 8px; border-radius: 8px; border: none; background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s; }
-.tab.active { background: var(--surface2); color: var(--text); font-weight: 600; }
-
-.rest-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border-radius: 12px; margin-bottom: 0.7rem; border: 1px solid var(--border); }
-.rest-bar label { font-size: 13px; color: var(--muted); white-space: nowrap; }
-.rest-bar input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; background: var(--surface2); border-radius: 2px; outline: none; }
-.rest-bar input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-.rest-bar span { font-size: 13px; font-weight: 600; color: var(--accent); min-width: 36px; text-align: right; }
-
-.sets-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border-radius: 12px; margin-bottom: 1rem; border: 1px solid var(--border); }
-.sets-bar label { font-size: 13px; color: var(--muted); white-space: nowrap; }
-.sets-btns { display: flex; gap: 6px; flex: 1; }
-.sets-btn { padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s; }
-.sets-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
-
-.timer-section-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; margin-top: 4px; }
-
-.current-ex-card {
-  background: var(--surface); border-radius: 16px; border: 1px solid var(--border);
-  margin-bottom: 1rem; overflow: hidden;
-  cursor: pointer; user-select: none; transition: background 0.15s;
-}
-.current-ex-card:active { background: var(--surface2); }
-.current-ex-top {
-  padding: 14px 16px 12px;
-  display: flex; justify-content: space-between; align-items: baseline;
-}
-.current-ex-card.completed-card { border-color: #38bdd4; cursor: default; background: linear-gradient(135deg, rgba(62,207,142,0.15) 0%, rgba(56,189,212,0.15) 100%); }
-.current-ex-card.completed-card:active { background: linear-gradient(135deg, rgba(62,207,142,0.15) 0%, rgba(56,189,212,0.15) 100%); }
-.current-ex-card.completed-card .current-ex-top { background: transparent; }
-.ex-name { font-size: 22px; font-weight: 700; }
-.ex-counter { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-.ex-counter-elapsed { font-size: 12px; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
-
-.list-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; margin-top: 0.8rem; }
-.list-title-row .timer-section-title { margin: 0; }
-.list-progress { font-size: 13px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
-
-.timer-main {
-  padding: 1.2rem 1rem 1.4rem;
-  min-height: 140px;
-  position: relative;
-  text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-}
-.rest-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: var(--surface2); border-radius: 0 0 16px 16px; overflow: hidden; }
-.rest-progress-bar { height: 100%; background: linear-gradient(90deg, var(--rest), #ff8c42); border-radius: 0 0 16px 16px; box-shadow: 0 0 8px rgba(245,166,35,0.6); }
-.timer-label { font-size: 17px; color: var(--text); font-weight: 500; letter-spacing: 0.01em; }
-.timer-display { font-size: 38px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; color: var(--muted); }
-.timer-display.resting { color: var(--rest); }
-.timer-display.completed { font-size: 26px; background: linear-gradient(90deg, var(--success), #38bdd4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-
-.sets-row { display: flex; gap: 8px; padding: 10px 4px; margin-bottom: 0.4rem; }
-.set-dot { flex: 1; height: 6px; border-radius: 3px; background: var(--surface2); transition: background 0.2s; }
-.set-dot.done { background: var(--success); }
-.set-dot.active { background: var(--accent); }
-
-.ex-list { display: flex; flex-direction: column; gap: 6px; }
-.ex-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 10px; border: 1px solid transparent; background: var(--surface2); cursor: pointer; transition: border-color 0.15s, opacity 0.2s; }
-.ex-item.current { border-color: var(--accent); }
-.ex-item.completed { opacity: 0.45; }
-.ex-num { font-size: 12px; color: var(--muted); width: 18px; }
-.ex-name-item { font-size: 14px; flex: 1; }
-.ex-prog { font-size: 12px; color: var(--text); }
-.ex-item.completed .ex-prog { color: var(--success); }
-.yt-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; cursor: pointer; opacity: 0.45; transition: opacity 0.15s; flex-shrink: 0; padding: 0; }
-.yt-btn:active { opacity: 1; }
-.yt-btn svg { width: 18px; height: 18px; }
-
-.copy-btn {
-  width: 100%; margin-top: 12px; padding: 13px;
-  border-radius: 10px; border: 1px solid var(--border);
-  background: var(--surface); color: var(--muted);
-  font-size: 13px; cursor: pointer; transition: all 0.15s;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.copy-btn:active { background: var(--surface2); }
-.copy-btn.copied { border-color: var(--success); color: var(--success); }
-
-.edit-sheet-btn { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; transition: all 0.15s; }
-.edit-sheet-btn:active { background: var(--surface2); }
-
-.sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
-.sheet-overlay.open { opacity: 1; pointer-events: auto; }
-.sheet-panel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 101; background: var(--surface); border-radius: 20px 20px 0 0; border-top: 1px solid var(--border); max-height: 88vh; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); }
-.sheet-panel.open { transform: translateY(0); }
-.sheet-handle-row { display: flex; justify-content: center; padding: 10px 0 4px; flex-shrink: 0; }
-.sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border); }
-.sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 4px 16px 12px; flex-shrink: 0; }
-.sheet-title { font-size: 16px; font-weight: 700; }
-.sheet-close { width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--surface2); color: var(--muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
-.sheet-body { overflow-y: auto; padding: 0 16px 24px; flex: 1; }
-.sheet-section-title { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.05em; margin: 4px 0 8px; }
-
-.sheet-tpl-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
-.sheet-tpl-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; transition: border-color 0.15s; }
-.sheet-tpl-item:active { border-color: var(--accent); }
-.sheet-tpl-item.selected { border-color: var(--accent); background: rgba(79,158,255,0.08); }
-.sheet-tpl-name { font-size: 14px; font-weight: 600; }
-.sheet-tpl-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.sheet-tpl-apply { font-size: 12px; color: var(--accent); font-weight: 600; flex-shrink: 0; padding-left: 8px; }
-
-.sheet-ex-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-.sheet-ex-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); }
-.sheet-ex-num { font-size: 12px; color: var(--muted); width: 18px; flex-shrink: 0; }
-.sheet-ex-name { font-size: 14px; flex: 1; }
-.sheet-move-btns { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
-.sheet-move-btn { width: 24px; height: 20px; border-radius: 5px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
-.sheet-move-btn:active { background: var(--surface); }
-.sheet-move-btn:disabled { opacity: 0.25; cursor: default; }
-.sheet-del-btn { width: 28px; height: 28px; border-radius: 7px; border: 1px solid rgba(255,92,92,0.3); background: transparent; color: var(--danger); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
-.sheet-del-btn:active { background: rgba(255,92,92,0.08); }
-.sheet-add-btn { width: 100%; padding: 11px; border-radius: 10px; border: 1px dashed var(--border); background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; margin-bottom: 14px; }
-.sheet-add-btn:active { background: var(--surface); }
-.sheet-apply-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
-.sheet-apply-btn:active { opacity: 0.85; }
-
-.theme-bar { display: flex; gap: 8px; margin-bottom: 1rem; }
-.theme-btn { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 14px; cursor: pointer; transition: all 0.15s; }
-.theme-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(79,158,255,0.08); font-weight: 600; }
-.theme-btn:active { background: var(--surface2); }
-
-.section-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; margin-top: 4px; letter-spacing: 0.03em; }
-.template-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
-.tpl-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; }
-.tpl-item:active { background: var(--surface2); }
-.tpl-name { font-size: 14px; font-weight: 600; }
-.tpl-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.tpl-arrow { color: var(--muted); font-size: 20px; line-height: 1; }
-
-.sound-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border); }
-.sound-bar label.sound-label { font-size: 13px; color: var(--muted); white-space: nowrap; }
-.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
-.toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-track { position: absolute; inset: 0; background: var(--surface2); border-radius: 12px; cursor: pointer; transition: background 0.2s; border: 1px solid var(--border); }
-.toggle input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
-.toggle-thumb { position: absolute; top: 3px; left: 4px; width: 15px; height: 15px; background: #fff; border-radius: 50%; transition: transform 0.2s; pointer-events: none; }
-.toggle input:checked ~ .toggle-thumb { transform: translateX(21px); }
-
-.edit-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
-.edit-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); }
-.edit-num { font-size: 12px; color: var(--muted); width: 18px; flex-shrink: 0; }
-.edit-item input { flex: 1; background: transparent; border: none; color: var(--text); font-size: 14px; outline: none; font-family: inherit; min-width: 0; }
-.edit-item input::placeholder { color: var(--muted); }
-.del-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid rgba(255,92,92,0.3); background: transparent; color: var(--danger); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1; }
-.add-btn { width: 100%; padding: 12px; border-radius: 10px; border: 1px dashed var(--border); background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; margin-bottom: 0.5rem; }
-.add-btn:active { background: var(--surface); }
-.clear-ex-btn { width: 100%; padding: 11px; border-radius: 10px; border: 1px solid rgba(255,92,92,0.25); background: transparent; color: var(--danger); font-size: 13px; cursor: pointer; margin-bottom: 1rem; opacity: 0.7; }
-.clear-ex-btn:active { background: rgba(255,92,92,0.08); opacity: 1; }
-.apply-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
-.apply-btn:active { opacity: 0.85; }
-
-.planner-box { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 14px; margin-bottom: 1rem; }
-.planner-textarea { width: 100%; min-height: 90px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 12px; font-family: monospace; padding: 10px; resize: none; outline: none; margin-bottom: 10px; }
-.planner-textarea::placeholder { color: var(--muted); }
-.planner-load-btn { width: 100%; padding: 11px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
-.planner-load-btn:active { opacity: 0.85; }
-.planner-msg { font-size: 12px; margin-top: 8px; text-align: center; min-height: 18px; }
-.planner-msg.ok { color: var(--success); }
-.planner-msg.err { color: var(--danger); }
-
-.done-view { text-align: center; padding: 2rem 1rem; }
-.done-big { font-size: 32px; font-weight: 700; color: var(--success); margin-bottom: 8px; }
-.done-sub { font-size: 14px; color: var(--muted); margin-bottom: 1.5rem; }
-.done-copy-btn {
-  width: 100%; padding: 14px; border-radius: 12px;
-  border: 1px solid var(--success); background: rgba(62,207,142,0.1);
-  color: var(--success); font-size: 15px; font-weight: 600; cursor: pointer;
-  margin-bottom: 0.7rem;
-}
-.done-copy-btn.copied { background: rgba(62,207,142,0.25); }
-.reset-btn { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 15px; cursor: pointer; }
-
-.wake-indicator { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 0.7rem; }
-.wake-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
-.wake-dot.active { background: var(--success); }
-.wake-now { margin-left: auto; font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
-
-.session-elapsed { font-size: 14px; color: var(--muted); }
-.session-elapsed span { font-size: 28px; font-weight: 700; color: var(--accent); margin-left: 6px; font-variant-numeric: tabular-nums; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="wrap">
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('timer')">타이머</button>
-    <button class="tab" onclick="switchTab('settings')">설정</button>
+    <button class="tab active" onclick="App.switchTab('timer')">타이머</button>
+    <button class="tab" onclick="App.switchTab('planner')">플래너</button>
+    <button class="tab" onclick="App.switchTab('history')">기록</button>
   </div>
 
+  <!-- ══ 타이머 탭 ══════════════════════════════════ -->
   <div id="timerTab">
     <div class="wake-indicator">
       <div class="wake-dot" id="wakeDot"></div>
@@ -218,11 +24,11 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
     </div>
 
     <div id="mainView">
-      <div class="timer-section-title">현재 운동</div>
-      <div class="current-ex-card" id="timerCard" onclick="handleCardTap()">
+      <div class="section-label">현재 운동</div>
+      <div class="current-ex-card" id="timerCard">
         <div class="current-ex-top">
           <div class="ex-name" id="exName"></div>
-          <div class="ex-counter" id="exCounter">
+          <div class="ex-counter">
             <span class="ex-counter-elapsed" id="exCounterElapsed"></span>
           </div>
         </div>
@@ -237,642 +43,181 @@ body { background: var(--bg); color: var(--text); font-family: 'Apple SD Gothic 
       <div class="sets-row" id="setsRow"></div>
 
       <div class="list-title-row">
-        <div class="timer-section-title">종목 목록</div>
+        <div class="section-label">종목 목록</div>
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="list-progress" id="listProgress"></span>
-          <button class="edit-sheet-btn" onclick="openSheet()">✏ 편집</button>
+          <button class="edit-sheet-btn" onclick="Planner.openRoutineEditor(null, {name: Session.routineName, exercises: Session.exercises}, true)">편집</button>
         </div>
       </div>
       <div class="ex-list" id="exList"></div>
-      <button class="copy-btn" id="midCopyBtn" onclick="copyRecord()">
-        <span id="midCopyText">📋 현재까지 기록 복사</span>
-      </button>
+      <button class="copy-btn" id="midCopyBtn">📋 현재까지 기록 복사</button>
     </div>
+
     <div class="done-view" id="doneView" style="display:none;">
-      <div class="done-big">운동 완료</div>
+      <div class="done-big">운동 완료 🎉</div>
       <div class="done-sub" id="doneSub"></div>
-      <button class="done-copy-btn" id="doneCopyBtn" onclick="copyRecord(true)">📋 기록 복사 (Notion용)</button>
-      <button class="reset-btn" onclick="resetAll()">다시 시작</button>
+      <div class="done-streak" id="doneStreak"></div>
+      <button class="done-copy-btn" id="doneCopyBtn">📋 기록 복사 (Notion용)</button>
+      <button class="reset-btn" id="resetBtn">다시 시작</button>
     </div>
   </div>
 
-  <div id="settingsTab" style="display:none;">
-    <div class="section-title">세트 수</div>
-    <div class="sets-bar">
-      <label>세트 수</label>
-      <div class="sets-btns">
-        <button class="sets-btn" data-n="1" onclick="pickSets(1)">1</button>
-        <button class="sets-btn" data-n="2" onclick="pickSets(2)">2</button>
-        <button class="sets-btn active" data-n="3" onclick="pickSets(3)">3</button>
-        <button class="sets-btn" data-n="4" onclick="pickSets(4)">4</button>
-        <button class="sets-btn" data-n="5" onclick="pickSets(5)">5</button>
-      </div>
-      <label class="sound-label" style="font-size:13px;color:var(--muted);white-space:nowrap;margin-left:4px;">소리</label>
-      <label class="toggle">
-        <input type="checkbox" id="soundToggle" checked>
-        <div class="toggle-track"></div>
-        <div class="toggle-thumb"></div>
-      </label>
+  <!-- ══ 플래너 탭 ══════════════════════════════════ -->
+  <div id="plannerTab" style="display:none;">
+
+    <div class="planner-section">
+      <div class="section-label">내 루틴</div>
+      <div id="routineList"></div>
+      <button class="sheet-apply-btn" style="margin-top:4px;" onclick="Planner.openRoutineEditor()">+ 새 루틴 만들기</button>
     </div>
-    <div class="section-title">휴식 시간</div>
-    <div class="rest-bar" style="margin-bottom:1.5rem;">
-      <label>휴식</label>
-      <input type="range" id="restSlider" min="20" max="90" step="5" value="60">
-      <span id="restVal">60초</span>
+
+    <div class="planner-section">
+      <div class="section-label">템플릿</div>
+      <div id="tplPickList"></div>
     </div>
-    <div class="section-title">화면 테마</div>
-    <div class="theme-bar">
-      <button class="theme-btn active" id="themeDark" onclick="setTheme('dark')">🌙 다크</button>
-      <button class="theme-btn" id="themeLight" onclick="setTheme('light')">☀️ 라이트</button>
-    </div>
-    <div class="section-title">템플릿</div>
-    <div class="template-list" id="tplList"></div>
-    <div class="section-title">플래너 불러오기</div>
-    <div class="planner-box">
-      <textarea class="planner-textarea" id="plannerInput" placeholder='Claude가 출력한 JSON을 붙여넣으세요&#10;{"label":"상체 + 코어","exercises":[{"name":"플로어 프레스","sets":3}, ...]}'></textarea>
-      <button class="planner-load-btn" onclick="loadPlanner()">불러오기</button>
+
+    <div class="planner-section">
+      <div class="section-label">JSON 플래너 불러오기</div>
+      <textarea class="planner-textarea" id="plannerInput" placeholder='{"label":"루틴 이름","exercises":[{"name":"플로어 프레스","sets":3}, ...]}'></textarea>
+      <button class="planner-load-btn" id="plannerLoadBtn">불러오기</button>
       <div class="planner-msg" id="plannerMsg"></div>
     </div>
-    <div class="section-title">종목 편집 <span style="font-weight:400;font-size:12px;color:var(--muted);">(최대 10개)</span></div>
-    <div class="edit-list" id="editList"></div>
-    <button class="add-btn" id="addBtn" onclick="addExercise()">+ 종목 추가</button>
-    <button class="clear-ex-btn" id="clearExBtn" onclick="clearExercises()">✕ 종목 목록 초기화</button>
-    <button class="apply-btn" onclick="applySettings()">적용하고 운동 시작</button>
   </div>
+
+  <!-- ══ 기록 탭 ══════════════════════════════════════ -->
+  <div id="historyTab" style="display:none;">
+    <div class="section-label" style="margin-bottom:10px;">대시보드</div>
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-value" id="statStreak">0</div>
+        <div class="stat-label">🔥 연속 운동일</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statWeekCount">0</div>
+        <div class="stat-label">이번 주 운동 횟수</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statTotalDays">0</div>
+        <div class="stat-label">총 운동 일수</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statTotalSets">0</div>
+        <div class="stat-label">총 완료 세트</div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin:14px 0 10px;">차트</div>
+    <div class="chart-tabs">
+      <button class="chart-tab active" data-mode="week">이번 주</button>
+      <button class="chart-tab" data-mode="month">최근 30일</button>
+    </div>
+    <div id="chartContainer"></div>
+
+    <div class="section-label" style="margin-top:14px;margin-bottom:8px;">운동 기록</div>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- ══ 설정 패널 (타이머 탭 하단 편집 시트 내부) ══ -->
+  <!-- 설정은 플래너 시트 내 또는 별도 접근 -->
 </div>
 
-<script>
-const TEMPLATES = [
-  { name: "전신 덤벨", desc: "7종목 · 하체→가슴→등→어깨→팔", exercises: ["덤벨 스쿼트","덤벨 런지","덤벨 데드리프트","플로어 프레스","원암 덤벨 로우","숄더 프레스","레터럴 레이즈"] },
-  { name: "상체 덤벨", desc: "6종목 · 가슴→등→어깨→팔", exercises: ["플로어 프레스","플로어 프레스 (모아서)","원암 덤벨 로우","숄더 프레스","레터럴 레이즈","이두 컬"] },
-  { name: "하체 덤벨", desc: "5종목 · 대퇴→둔근→햄스트링", exercises: ["덤벨 스쿼트","덤벨 런지","덤벨 데드리프트","덤벨 힙 쓰러스트","덤벨 카프 레이즈"] },
-  { name: "어깨·팔", desc: "5종목 · 어깨→이두→삼두", exercises: ["숄더 프레스","레터럴 레이즈","프론트 레이즈","이두 컬","해머 컬"] },
-  { name: "맨몸 전신", desc: "6종목 · 도구 없이", exercises: ["푸시업","와이드 푸시업","딥스","스쿼트","런지","플랭크"] },
-];
-
-let exercises = [...TEMPLATES[0].exercises];
-let templateName = TEMPLATES[0].name;
-let SETS = 3;
-let exIdx = 0;
-let setsArr = [];
-let resting = false;
-let restRemaining = 0;
-let restDuration = 60;
-let restTimer = null;
-let startTime = Date.now();
-let startDateTime = '';
-(function() {
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  startDateTime = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate())
-    + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-})();
-let editExercises = [];
-let audioCtx = null;
-let soundEnabled = true;
-let wakeLock = null;
-let elapsedTimer = null;
-let pendingNext = -1;
-
-function initSets() { setsArr = Array(exercises.length).fill(0); }
-initSets();
-
-async function requestWakeLock() {
-  if (!('wakeLock' in navigator)) return;
-  try {
-    wakeLock = await navigator.wakeLock.request('screen');
-    updateWakeIndicator(true);
-    wakeLock.addEventListener('release', () => updateWakeIndicator(false));
-  } catch(e) { updateWakeIndicator(false); }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock) { await wakeLock.release(); wakeLock = null; }
-  updateWakeIndicator(false);
-}
-
-function updateWakeIndicator(active) {
-  document.getElementById('wakeDot').className = 'wake-dot' + (active ? ' active' : '');
-  document.getElementById('wakeLabel').textContent = active ? '화면 유지 중' : '화면 유지 비활성';
-}
-
-document.addEventListener('visibilitychange', async () => {
-  if (wakeLock !== null && document.visibilityState === 'visible') await requestWakeLock();
-});
-
-requestWakeLock();
-
-function buildRecord() {
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  const dateStr = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate());
-  const elapsed = Math.round((Date.now() - startTime) / 60000);
-  const completed = exercises.filter((_, i) => setsArr[i] >= SETS);
-  const partial = exercises.map((ex, i) => ({ name: ex, sets: setsArr[i] })).filter(e => e.sets > 0);
-  return JSON.stringify({
-    date: dateStr,
-    template: templateName,
-    total_sets: SETS,
-    exercises: partial,
-    completed_count: completed.length,
-    total_count: exercises.length,
-    duration_min: elapsed
-  });
-}
-
-function copyRecord(isDone) {
-  const json = buildRecord();
-  navigator.clipboard.writeText(json).then(() => {
-    if (isDone) {
-      const btn = document.getElementById('doneCopyBtn');
-      btn.textContent = '✓ 복사 완료';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '📋 기록 복사 (Notion용)'; btn.classList.remove('copied'); }, 2000);
-    } else {
-      const btn = document.getElementById('midCopyBtn');
-      const txt = document.getElementById('midCopyText');
-      txt.textContent = '✓ 복사 완료';
-      btn.classList.add('copied');
-      setTimeout(() => { txt.textContent = '📋 현재까지 기록 복사'; btn.classList.remove('copied'); }, 2000);
-    }
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = json; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta);
-  });
-}
-
-function getAudioCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return audioCtx;
-}
-function playTones(tones) {
-  if (!soundEnabled) return;
-  try {
-    const ctx = getAudioCtx();
-    tones.forEach(([freq, start, dur]) => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = freq; o.type = 'sine';
-      const t = ctx.currentTime + start;
-      g.gain.setValueAtTime(0.4, t);
-      g.gain.exponentialRampToValueAtTime(0.001, t + dur + 0.1);
-      o.start(t); o.stop(t + dur + 0.15);
-    });
-  } catch(e) {}
-}
-function playSetComplete() { playTones([[440,0,0.08],[660,0.12,0.08]]); }
-function playExComplete() { playTones([[330,0,0.08],[440,0.1,0.08],[550,0.2,0.08],[660,0.3,0.15]]); }
-function playRestEnd() { playTones([[880,0,0.06],[660,0.1,0.1]]); }
-function vibrateLong() { if (navigator.vibrate) navigator.vibrate(500); }
-
-document.getElementById('restSlider').addEventListener('input', function() {
-  restDuration = parseInt(this.value);
-  document.getElementById('restVal').textContent = restDuration + '초';
-});
-document.getElementById('soundToggle').addEventListener('change', function() {
-  soundEnabled = this.checked;
-});
-
-function switchTab(t) {
-  document.getElementById('timerTab').style.display = t === 'timer' ? 'block' : 'none';
-  document.getElementById('settingsTab').style.display = t === 'settings' ? 'block' : 'none';
-  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', (i===0&&t==='timer')||(i===1&&t==='settings')));
-  if (t === 'settings') renderSettings();
-  if (t === 'timer' && resting) restoreProgressBar();
-}
-
-function restoreProgressBar() {
-  const bar = document.getElementById('progressBar');
-  if (!bar) return;
-  const ratio = restRemaining / restDuration;
-  bar.style.transition = 'none';
-  bar.style.width = (ratio * 100) + '%';
-  setTimeout(() => {
-    bar.style.transition = 'width ' + restRemaining + 's linear';
-    bar.style.width = '0%';
-  }, 60);
-}
-
-function renderAll() {
-  if (setsArr.every(s => s >= SETS)) {
-    document.getElementById('mainView').style.display = 'none';
-    document.getElementById('doneView').style.display = 'block';
-    const elapsed = Math.round((Date.now() - startTime) / 60000);
-    document.getElementById('doneSub').textContent = exercises.length + '종목 ' + (exercises.length * SETS) + '세트 · ' + elapsed + '분';
-    return;
-  }
-  document.getElementById('exName').textContent = (resting && pendingNext !== -1) ? exercises[pendingNext] : exercises[exIdx];
-  const counterElapsed = document.getElementById('exCounterElapsed');
-  if (counterElapsed) {
-    const elapsed = Math.round((Date.now() - startTime) / 60000);
-    counterElapsed.textContent = '경과 ' + elapsed + '분';
-  }
-  const doneCount = setsArr.filter((s, i) => s >= SETS).length;
-  const prog = document.getElementById('listProgress');
-  if (prog) prog.textContent = doneCount + ' / ' + exercises.length;
-  renderDots(); renderTimer(); renderList();
-  updateSessionInfo();
-}
-
-function renderDots() {
-  const row = document.getElementById('setsRow');
-  row.innerHTML = '';
-  const done = setsArr[exIdx];
-  for (let i = 0; i < SETS; i++) {
-    const d = document.createElement('div');
-    d.className = 'set-dot' + (i < done ? ' done' : (i === done ? ' active' : ''));
-    row.appendChild(d);
-  }
-}
-
-const CHEER_FIRST = [
-  '탭해서 시작!', '준비되면 탭!', '자, 가보자!', '시작해볼까요?', '오늘도 화이팅!'
-];
-const CHEER_NEXT = [
-  '잘했어요! 탭!', '한 세트 더!', '그 기세 그대로!', '멈추지 마요!', '좋아, 다음!',
-  '몸이 기억해요!', '포기는 없다!', '한 번 더 가자!', '지금이 딱!', '최고예요, 탭!',
-  '이미 절반!', '힘내요!', '탭하면 끝!', '조금만 더!', '오늘 후회 없게!'
-];
-let lastCheerIdx = -1;
-function getCheer(isFirst) {
-  const arr = isFirst ? CHEER_FIRST : CHEER_NEXT;
-  let idx;
-  do { idx = Math.floor(Math.random() * arr.length); } while (arr.length > 1 && idx === lastCheerIdx);
-  lastCheerIdx = idx;
-  return arr[idx];
-}
-
-function renderTimer() {
-  const card = document.getElementById('timerCard');
-  const label = document.getElementById('timerLabel');
-  const display = document.getElementById('timerDisplay');
-  const prog = document.getElementById('progressWrap');
-  const done = setsArr[exIdx];
-  if (resting) {
-    card.className = 'current-ex-card';
-    label.textContent = pendingNext !== -1 ? '종목 완료 · 탭하면 스킵' : '탭하면 스킵';
-    display.textContent = restRemaining + '초';
-    display.className = 'timer-display resting';
-    prog.style.display = 'block';
-  } else if (done >= SETS) {
-    card.className = 'current-ex-card completed-card';
-    label.textContent = '종목 완료';
-    display.textContent = '다음 종목으로 →';
-    display.className = 'timer-display completed';
-    prog.style.display = 'none';
-  } else {
-    card.className = 'current-ex-card';
-    label.textContent = getCheer(done === 0);
-    display.textContent = (done + 1) + ' / ' + SETS;
-    display.className = 'timer-display';
-    prog.style.display = 'none';
-  }
-}
-
-function renderList() {
-  const list = document.getElementById('exList');
-  list.innerHTML = '';
-  exercises.forEach((ex, i) => {
-    const isDone = setsArr[i] >= SETS;
-    const item = document.createElement('div');
-    item.className = 'ex-item' + (i === exIdx ? ' current' : '') + (isDone ? ' completed' : '');
-    item.innerHTML = '<span class="ex-num">' + (i+1) + '</span><span class="ex-name-item">' + ex + '</span><span class="ex-prog">' + (isDone ? '✓' : (setsArr[i]+1) + '/' + SETS) + '</span>'
-      + '<button class="yt-btn" title="YouTube에서 검색">'
-      + '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">'
-      + '<rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/>'
-      + '<polygon points="10,8.5 16,12 10,15.5" fill="#fff"/>'
-      + '</svg></button>';
-    item.querySelector('.yt-btn').addEventListener('click', function(e) {
-      e.stopPropagation();
-      window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(ex), '_blank');
-    });
-    item.onclick = () => { exIdx = i; renderAll(); };
-    list.appendChild(item);
-  });
-}
-
-function handleCardTap() {
-  if (resting) { skipRest(); return; }
-  if (setsArr[exIdx] >= SETS) return;
-  completeSet();
-}
-
-function completeSet() {
-  setsArr[exIdx]++;
-  if (setsArr[exIdx] < SETS) {
-    playSetComplete(); vibrateLong(); startRest();
-  } else {
-    playExComplete(); vibrateLong();
-    const next = exercises.findIndex((_, i) => i > exIdx && setsArr[i] < SETS);
-    if (next !== -1) {
-      startRestThenNext(next);
-    } else {
-      renderAll();
-      setTimeout(() => checkDone(), 400);
-    }
-  }
-}
-
-function startRestThenNext(nextIdx) {
-  pendingNext = nextIdx;
-  resting = true; restRemaining = restDuration; renderAll();
-  const bar = document.getElementById('progressBar');
-  bar.style.transition = 'none'; bar.style.width = '100%';
-  setTimeout(() => { bar.style.transition = 'width ' + restDuration + 's linear'; bar.style.width = '0%'; }, 60);
-  restTimer = setInterval(() => {
-    restRemaining--;
-    if (restRemaining <= 0) {
-      clearInterval(restTimer); resting = false;
-      exIdx = pendingNext; pendingNext = -1;
-      playRestEnd(); vibrateLong(); renderAll();
-    } else { document.getElementById('timerDisplay').textContent = restRemaining + '초'; }
-  }, 1000);
-}
-
-function startRest() {
-  resting = true; restRemaining = restDuration; renderAll();
-  const bar = document.getElementById('progressBar');
-  bar.style.transition = 'none'; bar.style.width = '100%';
-  setTimeout(() => { bar.style.transition = 'width ' + restDuration + 's linear'; bar.style.width = '0%'; }, 60);
-  restTimer = setInterval(() => {
-    restRemaining--;
-    if (restRemaining <= 0) {
-      clearInterval(restTimer); resting = false; playRestEnd(); vibrateLong(); renderAll();
-    } else { document.getElementById('timerDisplay').textContent = restRemaining + '초'; }
-  }, 1000);
-}
-
-function skipRest() {
-  clearInterval(restTimer); resting = false;
-  document.getElementById('progressBar').style.transition = 'none';
-  if (pendingNext !== -1) { exIdx = pendingNext; pendingNext = -1; }
-  renderAll();
-}
-
-function checkDone() {
-  if (setsArr.every(s => s >= SETS)) {
-    renderAll(); playExComplete(); vibrateLong();
-  }
-}
-
-function resetAll() {
-  clearInterval(restTimer); resting = false; exIdx = 0; startTime = Date.now();
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  startDateTime = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate())
-    + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-  initSets();
-  document.getElementById('mainView').style.display = 'block';
-  document.getElementById('doneView').style.display = 'none';
-  startElapsedTimer();
-  renderAll();
-}
-
-function renderSettings() {
-  editExercises = [...exercises];
-  renderTplList(); renderEditList();
-  document.querySelectorAll('.sets-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.n) === SETS));
-  document.getElementById('soundToggle').checked = soundEnabled;
-  document.getElementById('themeDark').classList.toggle('active', currentTheme === 'dark');
-  document.getElementById('themeLight').classList.toggle('active', currentTheme === 'light');
-}
-
-function renderTplList() {
-  const list = document.getElementById('tplList');
-  list.innerHTML = '';
-  TEMPLATES.forEach(t => {
-    const item = document.createElement('div');
-    item.className = 'tpl-item';
-    item.innerHTML = '<div><div class="tpl-name">' + t.name + '</div><div class="tpl-desc">' + t.desc + '</div></div><span class="tpl-arrow">›</span>';
-    item.onclick = () => { editExercises = [...t.exercises]; templateName = t.name; renderEditList(); };
-    list.appendChild(item);
-  });
-}
-
-function renderEditList() {
-  const list = document.getElementById('editList');
-  list.innerHTML = '';
-  editExercises.forEach((ex, i) => {
-    const item = document.createElement('div');
-    item.className = 'edit-item';
-    const num = document.createElement('span'); num.className = 'edit-num'; num.textContent = i+1;
-    const inp = document.createElement('input');
-    inp.type = 'text'; inp.value = ex; inp.placeholder = '종목명';
-    const idx = i;
-    inp.oninput = () => { editExercises[idx] = inp.value; };
-    const del = document.createElement('button');
-    del.className = 'del-btn'; del.textContent = '×';
-    del.onclick = () => { editExercises.splice(idx, 1); renderEditList(); };
-    item.appendChild(num); item.appendChild(inp); item.appendChild(del);
-    list.appendChild(item);
-  });
-  document.getElementById('addBtn').style.display = editExercises.length >= 10 ? 'none' : 'block';
-}
-
-function addExercise() {
-  if (editExercises.length >= 10) return;
-  editExercises.push(''); renderEditList();
-  const inputs = document.querySelectorAll('.edit-item input');
-  if (inputs.length) inputs[inputs.length-1].focus();
-}
-
-function pickSets(n) {
-  SETS = n;
-  document.querySelectorAll('.sets-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.n) === n));
-}
-
-function applySettings() {
-  const filtered = editExercises.filter(e => e.trim() !== '');
-  if (!filtered.length) { alert('종목을 1개 이상 입력해주세요.'); return; }
-  exercises = filtered;
-  clearInterval(restTimer); resting = false; exIdx = 0; startTime = Date.now();
-  const now = new Date();
-  const pad = n => String(n).padStart(2,'0');
-  startDateTime = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate())
-    + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-  initSets(); startElapsedTimer(); switchTab('timer'); renderAll();
-}
-
-// ── 테마 ──────────────────────────────────────────────
-let currentTheme = localStorage.getItem('theme') || 'dark';
-function setTheme(t) {
-  currentTheme = t;
-  document.documentElement.classList.toggle('light', t === 'light');
-  localStorage.setItem('theme', t);
-  document.getElementById('themeDark').classList.toggle('active', t === 'dark');
-  document.getElementById('themeLight').classList.toggle('active', t === 'light');
-}
-setTheme(currentTheme);
-
-// ── 세션 정보 (경과 시간 + 현재 시각) ───────────────
-function updateSessionInfo() {
-  const nowEl = document.getElementById('wakeNow');
-  if (nowEl) {
-    const now = new Date();
-    const pad = n => String(n).padStart(2,'0');
-    const days = ['일','월','화','수','목','금','토'];
-    const mm = pad(now.getMonth() + 1);
-    const dd = pad(now.getDate());
-    const day = days[now.getDay()];
-    const hh = pad(now.getHours());
-    const min = pad(now.getMinutes());
-    nowEl.textContent = mm + '/' + dd + '(' + day + ') ' + hh + ':' + min;
-  }
-}
-
-function startElapsedTimer() {
-  if (elapsedTimer) clearInterval(elapsedTimer);
-  updateSessionInfo();
-  elapsedTimer = setInterval(updateSessionInfo, 60000);
-}
-
-function stopElapsedTimer() {
-  if (elapsedTimer) { clearInterval(elapsedTimer); elapsedTimer = null; }
-}
-
-// ── Enter키로 다음 세트 진행 ──────────────────────────
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    const timerTab = document.getElementById('timerTab');
-    if (timerTab.style.display !== 'none') handleCardTap();
-  }
-});
-
-// ── 플래너 JSON 불러오기 ─────────────────────────────
-function loadPlanner() {
-  const raw = document.getElementById('plannerInput').value.trim();
-  const msg = document.getElementById('plannerMsg');
-  msg.textContent = '';
-  msg.className = 'planner-msg';
-  if (!raw) { msg.textContent = 'JSON을 붙여넣어 주세요.'; msg.className = 'planner-msg err'; return; }
-  let parsed;
-  try { parsed = JSON.parse(raw); } catch(e) { msg.textContent = '올바른 JSON 형식이 아닙니다.'; msg.className = 'planner-msg err'; return; }
-  if (!parsed.exercises || !Array.isArray(parsed.exercises) || !parsed.exercises.length) {
-    msg.textContent = 'exercises 항목이 없거나 비어 있습니다.'; msg.className = 'planner-msg err'; return;
-  }
-  const names = parsed.exercises.map(e => (e.name || '').trim()).filter(n => n !== '');
-  if (!names.length) { msg.textContent = '유효한 종목명이 없습니다.'; msg.className = 'planner-msg err'; return; }
-  const capped = names.slice(0, 10);
-  editExercises = capped;
-  templateName = parsed.label || parsed.date || '플래너';
-  renderEditList();
-  document.getElementById('plannerInput').value = '';
-  msg.textContent = '✓ ' + capped.length + '개 종목 불러오기 완료. 아래에서 확인 후 적용하세요.';
-  msg.className = 'planner-msg ok';
-}
-
-// ── 설정 > 종목 목록 초기화 ──────────────────────────
-function clearExercises() {
-  if (!confirm('종목 목록을 모두 초기화할까요?\n(템플릿은 유지됩니다)')) return;
-  editExercises = [];
-  renderEditList();
-}
-
-renderAll();
-startElapsedTimer();</script>
-
-<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
-<div class="sheet-panel" id="sheetPanel">
+<!-- ══ 루틴 에디터 바텀시트 ══════════════════════════ -->
+<div class="sheet-overlay" id="routineEditorSheetOverlay"></div>
+<div class="sheet-panel" id="routineEditorSheet">
   <div class="sheet-handle-row"><div class="sheet-handle"></div></div>
   <div class="sheet-header">
-    <div class="sheet-title">종목 편집</div>
-    <button class="sheet-close" onclick="closeSheet()">×</button>
+    <div class="sheet-title">루틴 편집</div>
+    <button class="sheet-close" id="closeEditorBtn">×</button>
   </div>
   <div class="sheet-body">
-    <div class="sheet-section-title">템플릿</div>
-    <div class="sheet-tpl-list" id="sheetTplList"></div>
-    <div class="sheet-section-title">현재 종목 <span style="font-weight:400;font-size:12px;color:var(--muted);">(최대 10개)</span></div>
-    <div class="sheet-ex-list" id="sheetExList"></div>
-    <button class="sheet-add-btn" id="sheetAddBtn" onclick="sheetAddEx()">+ 종목 추가</button>
-    <button class="sheet-apply-btn" onclick="sheetApply()">적용</button>
+    <input class="editor-name-input" id="editorRoutineName" type="text" placeholder="루틴 이름">
+    <div class="sheet-section-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>종목 <span style="font-weight:400;color:var(--muted);">(각 세트 수 개별 설정)</span></span>
+      <span style="margin-right:36px;">세트</span>
+    </div>
+    <div id="editorExList"></div>
+    <button class="sheet-add-btn" id="addEditorExBtn">+ 종목 추가</button>
+    <button class="sheet-apply-btn" id="applyToSessionBtn" style="display:none;margin-bottom:8px;background:var(--success);">현재 운동에 적용</button>
+    <button class="sheet-apply-btn" id="saveRoutineBtn">루틴으로 저장</button>
   </div>
 </div>
 
-<script>
-let sheetExercises = [];
+<!-- ══ 기록 상세 바텀시트 ═════════════════════════════ -->
+<div class="sheet-overlay" id="recordDetailSheetOverlay"></div>
+<div class="sheet-panel" id="recordDetailSheet">
+  <div class="sheet-handle-row"><div class="sheet-handle"></div></div>
+  <div class="sheet-header">
+    <div>
+      <div class="sheet-title" id="detailRoutineName"></div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="detailDate"></div>
+    </div>
+    <button class="sheet-close" id="closeDetailBtn">×</button>
+  </div>
+  <div class="sheet-body">
+    <div id="detailExList"></div>
+  </div>
+</div>
 
-function openSheet() {
-  sheetExercises = [...exercises];
-  renderSheetTplList();
-  renderSheetExList();
-  document.getElementById('sheetOverlay').classList.add('open');
-  document.getElementById('sheetPanel').classList.add('open');
+<!-- ══ 설정 시트 ══════════════════════════════════════ -->
+<div class="sheet-overlay" id="settingsSheetOverlay" onclick="closeSettingsSheet()"></div>
+<div class="sheet-panel" id="settingsSheet">
+  <div class="sheet-handle-row"><div class="sheet-handle"></div></div>
+  <div class="sheet-header">
+    <div class="sheet-title">설정</div>
+    <button class="sheet-close" onclick="closeSettingsSheet()">×</button>
+  </div>
+  <div class="sheet-body">
+    <div class="settings-section">
+      <div class="section-label">휴식 시간</div>
+      <div class="rest-bar">
+        <label>휴식</label>
+        <input type="range" id="restSlider" min="20" max="120" step="5" value="60">
+        <span id="restVal">60초</span>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="section-label">소리 & 진동</div>
+      <div class="sound-bar">
+        <label>완료음 / 진동</label>
+        <label class="toggle" style="margin-left:auto;">
+          <input type="checkbox" id="soundToggle" checked>
+          <div class="toggle-track"></div>
+          <div class="toggle-thumb"></div>
+        </label>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="section-label">화면 테마</div>
+      <div class="theme-bar">
+        <button class="theme-btn active" id="themeDark">🌙 다크</button>
+        <button class="theme-btn" id="themeLight">☀️ 라이트</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 설정 버튼 (우측 상단 고정) -->
+<button
+  onclick="openSettingsSheet()"
+  style="position:fixed;top:12px;right:12px;width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:50;">
+  ⚙
+</button>
+
+<script src="js/state.js"></script>
+<script src="js/timer.js"></script>
+<script src="js/planner.js"></script>
+<script src="js/history.js"></script>
+<script src="js/app.js"></script>
+<script>
+function openSettingsSheet() {
+  document.getElementById('settingsSheetOverlay').classList.add('open');
+  document.getElementById('settingsSheet').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
-function closeSheet() {
-  document.getElementById('sheetOverlay').classList.remove('open');
-  document.getElementById('sheetPanel').classList.remove('open');
+function closeSettingsSheet() {
+  document.getElementById('settingsSheetOverlay').classList.remove('open');
+  document.getElementById('settingsSheet').classList.remove('open');
   document.body.style.overflow = '';
-}
-
-function renderSheetTplList() {
-  const list = document.getElementById('sheetTplList');
-  list.innerHTML = '';
-  TEMPLATES.forEach(t => {
-    const item = document.createElement('div');
-    const isCurrent = t.name === templateName;
-    item.className = 'sheet-tpl-item' + (isCurrent ? ' selected' : '');
-    item.innerHTML = '<div><div class="sheet-tpl-name">' + t.name + '</div><div class="sheet-tpl-desc">' + t.desc + '</div></div>'
-      + '<span class="sheet-tpl-apply">' + (isCurrent ? '현재' : '적용') + '</span>';
-    item.onclick = () => {
-      if (isCurrent) return;
-      if (!confirm(t.name + ' 템플릿을 적용할까요?\n현재 진행 중인 운동이 초기화됩니다.')) return;
-      templateName = t.name;
-      exercises = [...t.exercises];
-      clearInterval(restTimer); resting = false; exIdx = 0; pendingNext = -1; startTime = Date.now();
-      const now = new Date(); const pad = n => String(n).padStart(2,'0');
-      startDateTime = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
-      initSets(); startElapsedTimer();
-      closeSheet(); renderAll();
-    };
-    list.appendChild(item);
-  });
-}
-
-function renderSheetExList() {
-  const list = document.getElementById('sheetExList');
-  list.innerHTML = '';
-  sheetExercises.forEach((ex, i) => {
-    const item = document.createElement('div');
-    item.className = 'sheet-ex-item';
-    const num = document.createElement('span'); num.className = 'sheet-ex-num'; num.textContent = i + 1;
-    const name = document.createElement('span'); name.className = 'sheet-ex-name'; name.textContent = ex;
-    const moves = document.createElement('div'); moves.className = 'sheet-move-btns';
-    const up = document.createElement('button'); up.className = 'sheet-move-btn'; up.textContent = '▲';
-    up.disabled = i === 0;
-    up.onclick = () => { [sheetExercises[i-1], sheetExercises[i]] = [sheetExercises[i], sheetExercises[i-1]]; renderSheetExList(); };
-    const dn = document.createElement('button'); dn.className = 'sheet-move-btn'; dn.textContent = '▼';
-    dn.disabled = i === sheetExercises.length - 1;
-    dn.onclick = () => { [sheetExercises[i], sheetExercises[i+1]] = [sheetExercises[i+1], sheetExercises[i]]; renderSheetExList(); };
-    moves.appendChild(up); moves.appendChild(dn);
-    const del = document.createElement('button'); del.className = 'sheet-del-btn'; del.textContent = '×';
-    del.onclick = () => { sheetExercises.splice(i, 1); renderSheetExList(); };
-    item.appendChild(num); item.appendChild(name); item.appendChild(moves); item.appendChild(del);
-    list.appendChild(item);
-  });
-  document.getElementById('sheetAddBtn').style.display = sheetExercises.length >= 10 ? 'none' : 'block';
-}
-
-function sheetAddEx() {
-  if (sheetExercises.length >= 10) return;
-  const name = prompt('추가할 종목명을 입력하세요');
-  if (!name || !name.trim()) return;
-  sheetExercises.push(name.trim());
-  renderSheetExList();
-}
-
-function sheetApply() {
-  const filtered = sheetExercises.filter(e => e.trim() !== '');
-  if (!filtered.length) { alert('종목을 1개 이상 입력해주세요.'); return; }
-  exercises = filtered;
-  if (exIdx >= exercises.length) exIdx = 0;
-  const newSets = Array(exercises.length).fill(0);
-  setsArr.forEach((s, i) => { if (i < newSets.length) newSets[i] = s; });
-  setsArr = newSets;
-  closeSheet(); renderAll();
 }
 </script>
 </body>
