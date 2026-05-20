@@ -298,12 +298,12 @@ const TimerUI = (() => {
       item.className = 'ex-item' + (i === Session.exIdx ? ' current' : '') + (isDone ? ' completed' : '');
       item.draggable = true;
       item.dataset.idx = String(i);
+      item.draggable = false; // 핸들에서만 드래그 활성화
       item.innerHTML =
         '<span class="drag-handle ex-drag-handle">⠿</span>' +
         '<span class="ex-num">' + (i+1) + '</span>' +
         '<span class="ex-name-item">' + ex.name + '</span>' +
-        '<span class="ex-sets-badge">' + ex.sets + '세트</span>' +
-        '<span class="ex-prog">' + (isDone ? '✓' : (ex.setsCompleted + 1) + '/' + ex.sets) + '</span>' +
+        '<span class="ex-prog">' + (isDone ? '✓' : (ex.setsCompleted + 1) + ' / ' + ex.sets) + '</span>' +
         '<button class="yt-btn" title="YouTube에서 검색">' +
         '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
         '<rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/>' +
@@ -316,11 +316,18 @@ const TimerUI = (() => {
       });
       item.onclick = () => { Session.exIdx = i; render(); };
 
+      // 데스크탑: 핸들 mousedown → draggable 활성, mouseup/leave → 비활성
+      const handle = item.querySelector('.ex-drag-handle');
+      handle.addEventListener('mousedown', () => { item.draggable = true; });
+      handle.addEventListener('mouseup',   () => { item.draggable = false; });
+      handle.addEventListener('mouseleave',() => { item.draggable = false; });
+
       item.addEventListener('dragstart', e => {
         exDragSrcIdx = i; e.dataTransfer.effectAllowed = 'move';
         requestAnimationFrame(() => item.classList.add('dragging'));
       });
       item.addEventListener('dragend', () => {
+        item.draggable = false;
         item.classList.remove('dragging');
         list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
       });
@@ -338,7 +345,8 @@ const TimerUI = (() => {
         exDragSrcIdx = null; render();
       });
 
-      item.querySelector('.ex-drag-handle').addEventListener('touchstart', e => {
+      // 모바일: 핸들 touchstart → 터치 드래그 활성
+      handle.addEventListener('touchstart', e => {
         exTouchSrcIdx = i; item.classList.add('dragging'); e.preventDefault();
       }, { passive: false });
 
