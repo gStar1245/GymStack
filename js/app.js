@@ -14,7 +14,9 @@ const App = (() => {
 
     if (tab === 'planner') { Planner.renderRoutineList(); Planner.renderTemplateList(); }
     if (tab === 'history') HistoryUI.render();
-    if (tab === 'timer' && Session.resting) TimerUI.restoreProgressBar();
+    if (tab === 'timer') {
+      if (Session.exercises.length && !Session.isAllDone()) TimerUI.restoreProgressBar();
+    }
   }
 
   function init() {
@@ -59,8 +61,16 @@ const App = (() => {
     document.getElementById('midCopyBtn')?.addEventListener('click', () => copyRecord(false));
     document.getElementById('doneCopyBtn')?.addEventListener('click', () => copyRecord(true));
 
-    // 다시 시작
-    document.getElementById('resetBtn')?.addEventListener('click', resetAll);
+    // 다시 시작 → 선택 화면으로
+    document.getElementById('resetBtn')?.addEventListener('click', () => Timer.showSelectView());
+
+    // 기본 템플릿 복원
+    document.getElementById('resetTemplatesBtn')?.addEventListener('click', () => {
+      if (confirm('기본 템플릿 5종으로 초기화할까요?')) {
+        Templates.reset();
+        alert('기본 템플릿이 복원되었습니다.');
+      }
+    });
 
     // 플래너 JSON 불러오기
     document.getElementById('plannerLoadBtn')?.addEventListener('click', Planner.loadPlannerJSON);
@@ -87,14 +97,10 @@ const App = (() => {
       });
     });
 
-    // 기본 루틴으로 세션 초기화
-    const defaultTemplate = TEMPLATES[0];
-    Session.init(defaultTemplate.exercises.map(e => ({...e})), defaultTemplate.name);
-
     // 초기 렌더
-    TimerUI.render();
     TimerUI.updateClock();
     Timer.requestWakeLock();
+    Timer.showSelectView();
 
     switchTab('timer');
   }

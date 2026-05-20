@@ -1,5 +1,5 @@
-// ── 상수 ──────────────────────────────────────────────
-const TEMPLATES = [
+// ── 기본 템플릿 원본 (복원용) ──────────────────────────
+const DEFAULT_TEMPLATES = [
   { name: "전신 덤벨", desc: "7종목 · 하체→가슴→등→어깨→팔",
     exercises: [
       { name: "덤벨 스쿼트", sets: 3 }, { name: "덤벨 런지", sets: 3 },
@@ -33,6 +33,37 @@ const TEMPLATES = [
     ]},
 ];
 
+// ── 템플릿 저장소 (localStorage) ──────────────────────
+const Templates = {
+  _key: 'v2_templates',
+  getAll() { return lsGet(this._key, null); },
+  _init() {
+    if (this.getAll() === null) {
+      const list = DEFAULT_TEMPLATES.map((t, i) => ({
+        id: 'tpl_' + i, name: t.name, desc: t.desc,
+        exercises: t.exercises.map(e => ({ ...e }))
+      }));
+      lsSet(this._key, list);
+    }
+  },
+  list() { this._init(); return lsGet(this._key, []); },
+  save(tpl) {
+    const list = this.list();
+    const idx = list.findIndex(t => t.id === tpl.id);
+    if (idx >= 0) list[idx] = tpl; else list.push(tpl);
+    lsSet(this._key, list);
+  },
+  delete(id) { lsSet(this._key, this.list().filter(t => t.id !== id)); },
+  genId() { return 'tpl_' + Date.now().toString(36); },
+  reset() {
+    const list = DEFAULT_TEMPLATES.map((t, i) => ({
+      id: 'tpl_' + i, name: t.name, desc: t.desc,
+      exercises: t.exercises.map(e => ({ ...e }))
+    }));
+    lsSet(this._key, list);
+  },
+};
+
 // ── LocalStorage 헬퍼 ──────────────────────────────────
 function lsGet(key, fallback = null) {
   try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : fallback; }
@@ -50,6 +81,8 @@ const Settings = {
   set restDuration(v) { lsSet('v2_rest', v); },
   get soundEnabled() { return lsGet('v2_sound', true); },
   set soundEnabled(v) { lsSet('v2_sound', v); },
+  get lastRoutineId() { return lsGet('v2_last_routine', null); },
+  set lastRoutineId(v) { lsSet('v2_last_routine', v); },
 };
 
 // ── 루틴 저장소 ───────────────────────────────────────

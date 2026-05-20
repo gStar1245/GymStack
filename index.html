@@ -23,7 +23,15 @@
       <span class="wake-now" id="wakeNow"></span>
     </div>
 
-    <div id="mainView">
+    <!-- 루틴 선택 화면 -->
+    <div id="selectView">
+      <div class="section-label" style="margin-bottom:10px;">내 루틴</div>
+      <div id="selectRoutineList"></div>
+      <div class="section-label" style="margin:16px 0 10px;">템플릿</div>
+      <div id="selectTemplateList"></div>
+    </div>
+
+    <div id="mainView" style="display:none;">
       <div class="section-label">현재 운동</div>
       <div class="current-ex-card" id="timerCard">
         <div class="current-ex-top">
@@ -192,6 +200,10 @@
         <button class="theme-btn active" id="themeDark">🌙 다크</button>
         <button class="theme-btn" id="themeLight">☀️ 라이트</button>
       </div>
+    </div>
+    <div class="settings-section">
+      <div class="section-label">템플릿 관리</div>
+      <button class="reset-btn" id="resetTemplatesBtn" style="font-size:13px;padding:10px;">기본 템플릿 복원</button>
     </div>
   </div>
 </div>
