@@ -132,7 +132,8 @@ const History = {
     let streak = 0, d = new Date(today);
     const dates = new Set(list.map(r => r.date));
     while (true) {
-      const key = d.toISOString().slice(0,10);
+      const _pad = n => String(n).padStart(2,'0');
+      const key = d.getFullYear()+'-'+_pad(d.getMonth()+1)+'-'+_pad(d.getDate());
       if (!dates.has(key)) {
         // 오늘이 없으면 어제부터 세기
         if (streak === 0 && d.getTime() === today.getTime()) { d.setDate(d.getDate()-1); continue; }
@@ -183,7 +184,7 @@ const Session = {
   buildRecord() {
     const now = new Date();
     const pad = n => String(n).padStart(2,'0');
-    const date = now.toISOString().slice(0,10);
+    const date = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
     const durationMin = Math.round((Date.now() - this.startTime) / 60000);
     const totalSets = this.exercises.reduce((s, e) => s + e.sets, 0);
     const completedSets = this.exercises.reduce((s, e) => s + Math.min(e.setsCompleted, e.sets), 0);

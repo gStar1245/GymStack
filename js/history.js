@@ -11,7 +11,6 @@ const HistoryUI = (() => {
   function renderSummaryCards() {
     const all = History.getAll();
     const streak = History.getStreak();
-    const today = new Date().toISOString().slice(0,10);
     const thisWeek = getThisWeekDates();
     const weekRecords = all.filter(r => thisWeek.includes(r.date));
     const totalDays = new Set(all.map(r => r.date)).size;
@@ -23,6 +22,11 @@ const HistoryUI = (() => {
     document.getElementById('statTotalSets').textContent = totalSets;
   }
 
+  function localDateStr(d) {
+    const pad = n => String(n).padStart(2,'0');
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  }
+
   function getThisWeekDates() {
     const today = new Date(); today.setHours(0,0,0,0);
     const day = today.getDay(); // 0=일
@@ -30,7 +34,7 @@ const HistoryUI = (() => {
     const dates = [];
     for (let i = 0; i < 7; i++) {
       const d = new Date(monday); d.setDate(monday.getDate() + i);
-      dates.push(d.toISOString().slice(0,10));
+      dates.push(localDateStr(d));
     }
     return dates;
   }
@@ -59,7 +63,7 @@ const HistoryUI = (() => {
     const labels = [], values = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date(today); d.setDate(today.getDate() - i);
-      const key = d.toISOString().slice(0,10);
+      const key = localDateStr(d);
       const records = all.filter(r => r.date === key);
       // 7일마다 레이블 표시
       labels.push(i % 7 === 0 || i === 0 ? (d.getMonth()+1)+'/'+d.getDate() : '');
@@ -70,7 +74,8 @@ const HistoryUI = (() => {
 
   function drawBarChart(labels, values, title) {
     const container = document.getElementById('chartContainer');
-    const max = Math.max(...values, 1);
+    const rawMax = Math.max(...values, 1);
+    const max = Math.ceil(rawMax * 1.3); // 30% 여유 → 최대 막대 위에 숫자 공간 확보
     const W = container.clientWidth || 340, H = 160;
     const padL = 28, padR = 8, padT = 24, padB = 28;
     const barW = Math.floor((W - padL - padR) / labels.length);
@@ -81,14 +86,14 @@ const HistoryUI = (() => {
     let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
     // 타이틀
     svg += `<text x="${W/2}" y="14" text-anchor="middle" font-size="11" fill="var(--muted)">${title}</text>`;
-    // Y축 선
+    // Y축 선 (레이블은 실제 데이터 max 기준)
     for (let i = 0; i <= 3; i++) {
       const y = padT + chartH - (chartH * i / 3);
-      const val = Math.round(max * i / 3);
+      const val = Math.round(rawMax * i / 3);
       svg += `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="var(--border)" stroke-width="1"/>`;
       if (val > 0) svg += `<text x="${padL-4}" y="${y+4}" text-anchor="end" font-size="9" fill="var(--muted)">${val}</text>`;
     }
-    // 바
+    // 바 (높이는 chartMax 기준으로 스케일링)
     values.forEach((v, i) => {
       const x = padL + i * barW + gap/2;
       const bh = Math.max(0, (v / max) * chartH);
