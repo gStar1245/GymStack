@@ -23,10 +23,12 @@ body {
 }
 .wrap { max-width: 480px; margin: 0 auto; }
 
-/* ── 탭 ──────────────────────────────────────────────── */
-.tabs { display: flex; gap: 4px; margin-bottom: 1.2rem; background: var(--surface); border-radius: 12px; padding: 4px; }
-.tab { flex: 1; padding: 9px; border-radius: 9px; border: none; background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+/* ── 헤더 (탭 + 설정 버튼) ───────────────────────────── */
+.header-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1.2rem; }
+.tabs { display: flex; gap: 4px; flex: 1; min-width: 0; background: var(--surface); border-radius: 12px; padding: 4px; }
+.tab { flex: 1; padding: 9px; border-radius: 9px; border: none; background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; min-width: 0; }
 .tab.active { background: var(--surface2); color: var(--text); font-weight: 600; }
+.settings-icon-btn { flex-shrink: 0; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
 /* ── Wake 표시줄 ─────────────────────────────────────── */
 .wake-indicator { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); margin-bottom: 0.7rem; }

@@ -9,10 +9,13 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="tabs">
-    <button class="tab active" onclick="App.switchTab('timer')">타이머</button>
-    <button class="tab" onclick="App.switchTab('planner')">플래너</button>
-    <button class="tab" onclick="App.switchTab('history')">기록</button>
+  <div class="header-row">
+    <div class="tabs">
+      <button class="tab active" onclick="App.switchTab('timer')">타이머</button>
+      <button class="tab" onclick="App.switchTab('planner')">플래너</button>
+      <button class="tab" onclick="App.switchTab('history')">기록</button>
+    </div>
+    <button class="settings-icon-btn" onclick="openSettingsSheet()" title="설정">⚙</button>
   </div>
 
   <!-- ══ 타이머 탭 ══════════════════════════════════ -->
@@ -208,12 +211,6 @@
   </div>
 </div>
 
-<!-- 설정 버튼 (우측 상단 고정) -->
-<button
-  onclick="openSettingsSheet()"
-  style="position:fixed;top:12px;right:12px;width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:50;">
-  ⚙
-</button>
 
 <script src="js/state.js"></script>
 <script src="js/timer.js"></script>
