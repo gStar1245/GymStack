@@ -298,7 +298,7 @@ const TimerUI = (() => {
       item.className = 'ex-item' + (i === Session.exIdx ? ' current' : '') + (isDone ? ' completed' : '');
       item.draggable = true;
       item.dataset.idx = String(i);
-      item.draggable = false; // 핸들에서만 드래그 활성화
+      item.draggable = true;
       item.innerHTML =
         '<span class="drag-handle ex-drag-handle">⠿</span>' +
         '<span class="ex-num">' + (i+1) + '</span>' +
@@ -316,18 +316,15 @@ const TimerUI = (() => {
       });
       item.onclick = () => { Session.exIdx = i; render(); };
 
-      // 데스크탑: 핸들 mousedown → draggable 활성, mouseup/leave → 비활성
       const handle = item.querySelector('.ex-drag-handle');
-      handle.addEventListener('mousedown', () => { item.draggable = true; });
-      handle.addEventListener('mouseup',   () => { item.draggable = false; });
-      handle.addEventListener('mouseleave',() => { item.draggable = false; });
 
       item.addEventListener('dragstart', e => {
+        // 핸들에서 시작된 드래그만 허용
+        if (!e.target.closest('.ex-drag-handle')) { e.preventDefault(); return; }
         exDragSrcIdx = i; e.dataTransfer.effectAllowed = 'move';
         requestAnimationFrame(() => item.classList.add('dragging'));
       });
       item.addEventListener('dragend', () => {
-        item.draggable = false;
         item.classList.remove('dragging');
         list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
       });
