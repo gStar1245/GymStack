@@ -84,7 +84,7 @@ const Planner = (() => {
       item.innerHTML =
         '<div class="tpl-info"><div class="tpl-name">' + t.name + '</div><div class="tpl-desc">' + t.desc + '</div></div>' +
         '<div class="tpl-actions">' +
-          '<button class="tpl-edit-btn">편집</button>' +
+          '<button class="tpl-edit-btn" title="편집"><svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14"><path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354z"/></svg></button>' +
           '<button class="tpl-del-btn">×</button>' +
         '</div>';
       item.querySelector('.tpl-edit-btn').onclick = () => {
@@ -213,7 +213,8 @@ const Planner = (() => {
       renderTemplateList();
       return;
     }
-    Routines.save(editRoutine);
+    const saved = Routines.save(editRoutine);
+    if (saved === false) { alert('루틴은 최대 ' + MAX_ROUTINES + '개까지 저장할 수 있습니다.\n기존 루틴을 삭제한 후 다시 시도해주세요.'); return; }
     closeSheet('routineEditorSheet');
     renderRoutineList();
   }

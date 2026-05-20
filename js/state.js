@@ -86,6 +86,8 @@ const Settings = {
 };
 
 // ── 루틴 저장소 ───────────────────────────────────────
+const MAX_ROUTINES = 10;
+
 const Routines = {
   _key: 'v2_routines',
   getAll() { return lsGet(this._key, []); },
@@ -93,8 +95,14 @@ const Routines = {
     // routine: { id, name, exercises: [{name, sets}], updatedAt }
     const list = this.getAll();
     const idx = list.findIndex(r => r.id === routine.id);
-    if (idx >= 0) list[idx] = routine; else list.unshift(routine);
+    if (idx >= 0) {
+      list[idx] = routine;
+    } else {
+      if (list.length >= MAX_ROUTINES) return false; // 상한선 초과
+      list.unshift(routine);
+    }
     lsSet(this._key, list);
+    return true;
   },
   delete(id) {
     const list = this.getAll().filter(r => r.id !== id);

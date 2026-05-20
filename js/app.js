@@ -68,6 +68,7 @@ const App = (() => {
     document.getElementById('resetTemplatesBtn')?.addEventListener('click', () => {
       if (confirm('기본 템플릿 5종으로 초기화할까요?')) {
         Templates.reset();
+        Planner.renderTemplateList();
         alert('기본 템플릿이 복원되었습니다.');
       }
     });
