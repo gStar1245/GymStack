@@ -73,16 +73,28 @@ const Planner = (() => {
   function renderTemplateList() {
     const list = document.getElementById('tplPickList');
     list.innerHTML = '';
-    TEMPLATES.forEach(t => {
+    const templates = Templates.list();
+    if (!templates.length) {
+      list.innerHTML = '<div class="empty-state">템플릿이 없습니다.<br>설정에서 기본 템플릿을 복원하세요.</div>';
+      return;
+    }
+    templates.forEach(t => {
       const item = document.createElement('div');
       item.className = 'tpl-pick-item';
       item.innerHTML =
-        '<div><div class="tpl-name">' + t.name + '</div><div class="tpl-desc">' + t.desc + '</div></div>' +
-        '<button class="tpl-use-btn">사용</button>';
-      item.querySelector('.tpl-use-btn').onclick = () => {
-        openRoutineEditor(null, {
-          name: t.name, exercises: t.exercises.map(e => ({ ...e }))
-        });
+        '<div class="tpl-info"><div class="tpl-name">' + t.name + '</div><div class="tpl-desc">' + t.desc + '</div></div>' +
+        '<div class="tpl-actions">' +
+          '<button class="tpl-edit-btn">편집</button>' +
+          '<button class="tpl-del-btn">×</button>' +
+        '</div>';
+      item.querySelector('.tpl-edit-btn').onclick = () => {
+        openRoutineEditor(null, { name: t.name, desc: t.desc, exercises: t.exercises.map(e => ({ ...e })), tplId: t.id });
+      };
+      item.querySelector('.tpl-del-btn').onclick = () => {
+        if (confirm('"' + t.name + '" 템플릿을 삭제할까요?')) {
+          Templates.delete(t.id);
+          renderTemplateList();
+        }
       };
       list.appendChild(item);
     });
@@ -104,7 +116,12 @@ const Planner = (() => {
     if (id) {
       editRoutine = JSON.parse(JSON.stringify(Routines.getAll().find(r => r.id === id)));
     } else if (preset) {
-      editRoutine = { id: Routines.genId(), name: preset.name, exercises: preset.exercises.map(e => ({ name: e.name, sets: e.sets || 3 })) };
+      editRoutine = {
+        id: Routines.genId(), name: preset.name,
+        exercises: preset.exercises.map(e => ({ name: e.name, sets: e.sets || 3 })),
+        _tplId: preset.tplId || null,
+        _desc: preset.desc || '',
+      };
     } else {
       editRoutine = { id: Routines.genId(), name: '', exercises: [] };
     }
@@ -188,6 +205,14 @@ const Planner = (() => {
     editRoutine.name = name;
     editRoutine.exercises = exs;
     editRoutine.updatedAt = new Date().toISOString().slice(0,10);
+    // 템플릿 편집인 경우 Templates에도 저장
+    if (editRoutine._tplId) {
+      Templates.save({ id: editRoutine._tplId, name, desc: editRoutine._desc || '', exercises: exs });
+      delete editRoutine._tplId; delete editRoutine._desc;
+      closeSheet('routineEditorSheet');
+      renderTemplateList();
+      return;
+    }
     Routines.save(editRoutine);
     closeSheet('routineEditorSheet');
     renderRoutineList();

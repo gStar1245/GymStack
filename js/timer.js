@@ -58,10 +58,64 @@ const Timer = (() => {
     return arr[idx];
   }
 
+  // ── 루틴 선택 화면 ────────────────────────────────
+  function showSelectView() {
+    document.getElementById('selectView').style.display = 'block';
+    document.getElementById('mainView').style.display = 'none';
+    document.getElementById('doneView').style.display = 'none';
+    _renderSelectRoutines();
+    _renderSelectTemplates();
+  }
+
+  function _renderSelectRoutines() {
+    const list = document.getElementById('selectRoutineList');
+    const routines = Routines.getAll();
+    const lastId = Settings.lastRoutineId;
+    if (!routines.length) {
+      list.innerHTML = '<div class="empty-state" style="padding:1rem 0;">저장된 루틴이 없습니다.</div>';
+      return;
+    }
+    list.innerHTML = '';
+    routines.forEach(r => {
+      const item = document.createElement('div');
+      item.className = 'select-routine-item' + (r.id === lastId ? ' last-used' : '');
+      const meta = r.exercises.length + '종목 · ' + r.exercises.reduce((s,e) => s+e.sets, 0) + '세트';
+      item.innerHTML =
+        '<div class="select-routine-info">' +
+          (r.id === lastId ? '<span class="last-used-badge">최근</span>' : '') +
+          '<div class="select-routine-name">' + r.name + '</div>' +
+          '<div class="select-routine-meta">' + meta + '</div>' +
+        '</div>' +
+        '<button class="select-start-btn">시작</button>';
+      item.querySelector('.select-start-btn').onclick = () => startSession(r.exercises, r.name, r.id);
+      list.appendChild(item);
+    });
+  }
+
+  function _renderSelectTemplates() {
+    const list = document.getElementById('selectTemplateList');
+    const templates = Templates.list();
+    list.innerHTML = '';
+    templates.forEach(t => {
+      const item = document.createElement('div');
+      item.className = 'select-routine-item';
+      item.innerHTML =
+        '<div class="select-routine-info">' +
+          '<div class="select-routine-name">' + t.name + '</div>' +
+          '<div class="select-routine-meta">' + t.desc + '</div>' +
+        '</div>' +
+        '<button class="select-start-btn">시작</button>';
+      item.querySelector('.select-start-btn').onclick = () => startSession(t.exercises, t.name);
+      list.appendChild(item);
+    });
+  }
+
   // ── 세션 시작 ──────────────────────────────────────
-  function startSession(exercises, routineName) {
+  function startSession(exercises, routineName, routineId = null) {
     clearInterval(restTimer);
     Session.init(exercises, routineName);
+    if (routineId) Settings.lastRoutineId = routineId;
+    document.getElementById('selectView').style.display = 'none';
     document.getElementById('mainView').style.display = 'block';
     document.getElementById('doneView').style.display = 'none';
     startElapsedTimer();
@@ -135,7 +189,7 @@ const Timer = (() => {
   }
 
   // ── 공개 API ──────────────────────────────────────
-  return { startSession, handleCardTap, skipRest, getCheer, requestWakeLock };
+  return { startSession, showSelectView, handleCardTap, skipRest, getCheer, requestWakeLock };
 })();
 
 // ── 타이머 UI ─────────────────────────────────────────
@@ -202,6 +256,39 @@ const TimerUI = (() => {
     }
   }
 
+  let exDragSrcIdx = null;
+  let exTouchSrcIdx = null;
+
+  document.addEventListener('touchmove', e => {
+    if (exTouchSrcIdx === null) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const list = document.getElementById('exList');
+    if (!list) return;
+    list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    const els = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const target = els.find(el => el.classList?.contains('ex-item') && parseInt(el.dataset.idx) !== exTouchSrcIdx);
+    if (target) target.classList.add('drag-over');
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (exTouchSrcIdx === null) return;
+    const list = document.getElementById('exList');
+    if (!list) return;
+    list.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+    const overEl = list.querySelector('.drag-over');
+    if (overEl) {
+      const dstIdx = parseInt(overEl.dataset.idx);
+      if (dstIdx !== exTouchSrcIdx) {
+        const moved = Session.exercises.splice(exTouchSrcIdx, 1)[0];
+        Session.exercises.splice(dstIdx, 0, moved);
+        if (Session.exIdx === exTouchSrcIdx) Session.exIdx = dstIdx;
+      }
+    }
+    exTouchSrcIdx = null;
+    render();
+  });
+
   function renderExList() {
     const list = document.getElementById('exList');
     list.innerHTML = '';
@@ -209,7 +296,10 @@ const TimerUI = (() => {
       const isDone = ex.setsCompleted >= ex.sets;
       const item = document.createElement('div');
       item.className = 'ex-item' + (i === Session.exIdx ? ' current' : '') + (isDone ? ' completed' : '');
+      item.draggable = true;
+      item.dataset.idx = String(i);
       item.innerHTML =
+        '<span class="drag-handle ex-drag-handle">⠿</span>' +
         '<span class="ex-num">' + (i+1) + '</span>' +
         '<span class="ex-name-item">' + ex.name + '</span>' +
         '<span class="ex-sets-badge">' + ex.sets + '세트</span>' +
@@ -219,11 +309,39 @@ const TimerUI = (() => {
         '<rect x="2" y="5" width="20" height="14" rx="4" fill="#FF0000"/>' +
         '<polygon points="10,8.5 16,12 10,15.5" fill="#fff"/>' +
         '</svg></button>';
+
       item.querySelector('.yt-btn').addEventListener('click', e => {
         e.stopPropagation();
         window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(ex.name), '_blank');
       });
       item.onclick = () => { Session.exIdx = i; render(); };
+
+      item.addEventListener('dragstart', e => {
+        exDragSrcIdx = i; e.dataTransfer.effectAllowed = 'move';
+        requestAnimationFrame(() => item.classList.add('dragging'));
+      });
+      item.addEventListener('dragend', () => {
+        item.classList.remove('dragging');
+        list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      });
+      item.addEventListener('dragover', e => {
+        e.preventDefault();
+        list.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        item.classList.add('drag-over');
+      });
+      item.addEventListener('drop', e => {
+        e.preventDefault();
+        if (exDragSrcIdx === null || exDragSrcIdx === i) return;
+        const moved = Session.exercises.splice(exDragSrcIdx, 1)[0];
+        Session.exercises.splice(i, 0, moved);
+        if (Session.exIdx === exDragSrcIdx) Session.exIdx = i;
+        exDragSrcIdx = null; render();
+      });
+
+      item.querySelector('.ex-drag-handle').addEventListener('touchstart', e => {
+        exTouchSrcIdx = i; item.classList.add('dragging'); e.preventDefault();
+      }, { passive: false });
+
       list.appendChild(item);
     });
   }
