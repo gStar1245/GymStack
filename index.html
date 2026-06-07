@@ -130,6 +130,20 @@
   <!-- 설정은 플래너 시트 내 또는 별도 접근 -->
 </div>
 
+<!-- ══ 루틴 미리보기 바텀시트 ════════════════════════ -->
+<div class="sheet-overlay" id="previewSheetOverlay" onclick="closePreviewSheet()"></div>
+<div class="sheet-panel" id="previewSheet">
+  <div class="sheet-handle-row"><div class="sheet-handle"></div></div>
+  <div class="sheet-header">
+    <div class="sheet-title" id="previewSheetTitle"></div>
+    <button class="sheet-close" onclick="closePreviewSheet()">×</button>
+  </div>
+  <div class="sheet-body">
+    <div id="previewExList"></div>
+    <button class="sheet-apply-btn" id="previewStartBtn" style="margin-top:16px;">시작</button>
+  </div>
+</div>
+
 <!-- ══ 루틴 에디터 바텀시트 ══════════════════════════ -->
 <div class="sheet-overlay" id="routineEditorSheetOverlay"></div>
 <div class="sheet-panel" id="routineEditorSheet">
@@ -216,6 +230,11 @@
 <script src="js/history.js"></script>
 <script src="js/app.js"></script>
 <script>
+function closePreviewSheet() {
+  document.getElementById('previewSheetOverlay').classList.remove('open');
+  document.getElementById('previewSheet').classList.remove('open');
+  document.body.style.overflow = '';
+}
 function openSettingsSheet() {
   document.getElementById('settingsSheetOverlay').classList.add('open');
   document.getElementById('settingsSheet').classList.add('open');

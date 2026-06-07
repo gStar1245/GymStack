@@ -289,6 +289,12 @@ body {
 /* 기록 상세 시트 */
 .detail-ex-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .detail-ex-item:last-child { border-bottom: none; }
+
+/* ── 루틴 미리보기 시트 ─────────────────────────────── */
+.preview-ex-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.preview-ex-item:last-child { border-bottom: none; }
+.preview-ex-name { font-size: 14px; color: var(--text); }
+.preview-ex-sets { font-size: 13px; color: var(--muted); flex-shrink: 0; margin-left: 8px; }
 .detail-ex-name { font-size: 14px; }
 .detail-ex-vol { font-size: 13px; color: var(--muted); }
 .detail-ex-vol.done { color: var(--success); }

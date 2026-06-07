@@ -67,6 +67,25 @@ const Timer = (() => {
     _renderSelectTemplates();
   }
 
+  function _openPreviewSheet(name, exercises, onStart) {
+    document.getElementById('previewSheetTitle').textContent = name;
+    const exList = document.getElementById('previewExList');
+    exList.innerHTML = '';
+    exercises.forEach(ex => {
+      const item = document.createElement('div');
+      item.className = 'preview-ex-item';
+      item.innerHTML =
+        '<span class="preview-ex-name">' + ex.name + '</span>' +
+        '<span class="preview-ex-sets">' + ex.sets + '세트</span>';
+      exList.appendChild(item);
+    });
+    const startBtn = document.getElementById('previewStartBtn');
+    startBtn.onclick = () => { closePreviewSheet(); onStart(); };
+    document.getElementById('previewSheetOverlay').classList.add('open');
+    document.getElementById('previewSheet').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
   function _renderSelectRoutines() {
     const list = document.getElementById('selectRoutineList');
     const routines = Routines.getAll();
@@ -83,7 +102,11 @@ const Timer = (() => {
           '<div class="select-routine-meta">' + meta + '</div>' +
         '</div>' +
         '<button class="select-start-btn">시작</button>';
-      item.querySelector('.select-start-btn').onclick = () => startSession(r.exercises, r.name, r.id);
+      item.querySelector('.select-start-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        startSession(r.exercises, r.name, r.id);
+      });
+      item.onclick = () => _openPreviewSheet(r.name, r.exercises, () => startSession(r.exercises, r.name, r.id));
       list.appendChild(item);
     });
   }
@@ -101,7 +124,11 @@ const Timer = (() => {
           '<div class="select-routine-meta">' + t.desc + '</div>' +
         '</div>' +
         '<button class="select-start-btn">시작</button>';
-      item.querySelector('.select-start-btn').onclick = () => startSession(t.exercises, t.name);
+      item.querySelector('.select-start-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        startSession(t.exercises, t.name);
+      });
+      item.onclick = () => _openPreviewSheet(t.name, t.exercises, () => startSession(t.exercises, t.name));
       list.appendChild(item);
     });
   }
