@@ -114,7 +114,7 @@ const Timer = (() => {
     const templates = Templates.list();
     list.innerHTML = '';
     templates.forEach(t => {
-      const item = _buildSelectItem(t.name, t.desc, t.exercises, '', () => startSession(t.exercises, t.name));
+      const item = _buildSelectItem(t.name, t.desc, t.exercises, '<span class="tpl-badge">템플릿</span>', () => startSession(t.exercises, t.name));
       list.appendChild(item);
     });
   }
