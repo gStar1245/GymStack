@@ -293,9 +293,7 @@ body {
 
 /* ── 루틴 미리보기 아코디언 ─────────────────────────── */
 .select-routine-row { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-.select-item-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.select-preview-arrow { font-size: 20px; color: var(--muted); line-height: 1; transition: transform 0.2s; display: inline-block; }
-.select-preview-arrow.open { transform: rotate(90deg); }
+.select-item-actions { display: flex; align-items: center; flex-shrink: 0; }
 .select-preview-body { padding: 8px 0 4px; }
 .preview-ex-item { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); }
 .preview-ex-item:last-child { border-bottom: none; }

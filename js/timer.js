@@ -78,7 +78,6 @@ const Timer = (() => {
           '<div class="select-routine-meta">' + meta + '</div>' +
         '</div>' +
         '<div class="select-item-actions">' +
-          '<span class="select-preview-arrow">›</span>' +
           '<button class="select-start-btn">시작</button>' +
         '</div>' +
       '</div>' +
@@ -88,13 +87,10 @@ const Timer = (() => {
         ).join('') +
       '</div>';
 
-    const arrow = item.querySelector('.select-preview-arrow');
-    const body  = item.querySelector('.select-preview-body');
+    const body = item.querySelector('.select-preview-body');
     item.querySelector('.select-start-btn').addEventListener('click', e => { e.stopPropagation(); onStart(); });
     item.querySelector('.select-routine-row').addEventListener('click', () => {
-      const open = body.style.display !== 'none';
-      body.style.display = open ? 'none' : 'block';
-      arrow.classList.toggle('open', !open);
+      body.style.display = body.style.display !== 'none' ? 'none' : 'block';
     });
     return item;
   }
