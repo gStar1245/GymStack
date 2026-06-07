@@ -71,10 +71,6 @@ const Timer = (() => {
     const list = document.getElementById('selectRoutineList');
     const routines = Routines.getAll();
     const lastId = Settings.lastRoutineId;
-    if (!routines.length) {
-      list.innerHTML = '<div class="empty-state" style="padding:1rem 0;">저장된 루틴이 없습니다.</div>';
-      return;
-    }
     list.innerHTML = '';
     routines.forEach(r => {
       const item = document.createElement('div');
