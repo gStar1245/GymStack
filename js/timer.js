@@ -178,6 +178,7 @@ const Timer = (() => {
 
   function saveRecord() {
     const record = Session.buildRecord();
+    Session._lastRecord = record; // 복사 버튼용 캐시
     History.add(record);
   }
 

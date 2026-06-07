@@ -114,7 +114,8 @@ const App = (() => {
   }
 
   function copyRecord(isDone) {
-    const record = Session.buildRecord();
+    // 완료 후 복사: 완료 시점에 저장된 record 사용 (재계산 시 시간 오차 방지)
+    const record = (isDone && Session._lastRecord) ? Session._lastRecord : Session.buildRecord();
     const text = JSON.stringify(record, null, 2);
     navigator.clipboard.writeText(text).then(() => {
       const btn = document.getElementById(isDone ? 'doneCopyBtn' : 'midCopyBtn');
