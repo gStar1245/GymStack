@@ -67,23 +67,36 @@ const Timer = (() => {
     _renderSelectTemplates();
   }
 
-  function _openPreviewSheet(name, exercises, onStart) {
-    document.getElementById('previewSheetTitle').textContent = name;
-    const exList = document.getElementById('previewExList');
-    exList.innerHTML = '';
-    exercises.forEach(ex => {
-      const item = document.createElement('div');
-      item.className = 'preview-ex-item';
-      item.innerHTML =
-        '<span class="preview-ex-name">' + ex.name + '</span>' +
-        '<span class="preview-ex-sets">' + ex.sets + '세트</span>';
-      exList.appendChild(item);
+  function _buildSelectItem(name, meta, exercises, badgeHtml, onStart) {
+    const item = document.createElement('div');
+    item.className = 'select-routine-item';
+    item.innerHTML =
+      '<div class="select-routine-row">' +
+        '<div class="select-routine-info">' +
+          badgeHtml +
+          '<div class="select-routine-name">' + name + '</div>' +
+          '<div class="select-routine-meta">' + meta + '</div>' +
+        '</div>' +
+        '<div class="select-item-actions">' +
+          '<span class="select-preview-arrow">›</span>' +
+          '<button class="select-start-btn">시작</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="select-preview-body" style="display:none;">' +
+        exercises.map(ex =>
+          '<div class="preview-ex-item"><span class="preview-ex-name">' + ex.name + '</span><span class="preview-ex-sets">' + ex.sets + '세트</span></div>'
+        ).join('') +
+      '</div>';
+
+    const arrow = item.querySelector('.select-preview-arrow');
+    const body  = item.querySelector('.select-preview-body');
+    item.querySelector('.select-start-btn').addEventListener('click', e => { e.stopPropagation(); onStart(); });
+    item.querySelector('.select-routine-row').addEventListener('click', () => {
+      const open = body.style.display !== 'none';
+      body.style.display = open ? 'none' : 'block';
+      arrow.classList.toggle('open', !open);
     });
-    const startBtn = document.getElementById('previewStartBtn');
-    startBtn.onclick = () => { closePreviewSheet(); onStart(); };
-    document.getElementById('previewSheetOverlay').classList.add('open');
-    document.getElementById('previewSheet').classList.add('open');
-    document.body.style.overflow = 'hidden';
+    return item;
   }
 
   function _renderSelectRoutines() {
@@ -92,21 +105,10 @@ const Timer = (() => {
     const lastId = Settings.lastRoutineId;
     list.innerHTML = '';
     routines.forEach(r => {
-      const item = document.createElement('div');
-      item.className = 'select-routine-item' + (r.id === lastId ? ' last-used' : '');
       const meta = r.exercises.length + '종목 · ' + r.exercises.reduce((s,e) => s+e.sets, 0) + '세트';
-      item.innerHTML =
-        '<div class="select-routine-info">' +
-          (r.id === lastId ? '<span class="last-used-badge">최근</span>' : '') +
-          '<div class="select-routine-name">' + r.name + '</div>' +
-          '<div class="select-routine-meta">' + meta + '</div>' +
-        '</div>' +
-        '<button class="select-start-btn">시작</button>';
-      item.querySelector('.select-start-btn').addEventListener('click', e => {
-        e.stopPropagation();
-        startSession(r.exercises, r.name, r.id);
-      });
-      item.onclick = () => _openPreviewSheet(r.name, r.exercises, () => startSession(r.exercises, r.name, r.id));
+      const badge = r.id === lastId ? '<span class="last-used-badge">최근</span>' : '';
+      const item = _buildSelectItem(r.name, meta, r.exercises, badge, () => startSession(r.exercises, r.name, r.id));
+      if (r.id === lastId) item.classList.add('last-used');
       list.appendChild(item);
     });
   }
@@ -116,19 +118,7 @@ const Timer = (() => {
     const templates = Templates.list();
     list.innerHTML = '';
     templates.forEach(t => {
-      const item = document.createElement('div');
-      item.className = 'select-routine-item';
-      item.innerHTML =
-        '<div class="select-routine-info">' +
-          '<div class="select-routine-name">' + t.name + '</div>' +
-          '<div class="select-routine-meta">' + t.desc + '</div>' +
-        '</div>' +
-        '<button class="select-start-btn">시작</button>';
-      item.querySelector('.select-start-btn').addEventListener('click', e => {
-        e.stopPropagation();
-        startSession(t.exercises, t.name);
-      });
-      item.onclick = () => _openPreviewSheet(t.name, t.exercises, () => startSession(t.exercises, t.name));
+      const item = _buildSelectItem(t.name, t.desc, t.exercises, '', () => startSession(t.exercises, t.name));
       list.appendChild(item);
     });
   }
