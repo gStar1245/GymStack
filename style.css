@@ -167,10 +167,23 @@ body {
 .last-used-badge { display: inline-block; font-size: 10px; font-weight: 700; color: #93c5fd; background: rgba(79,118,247,0.22); padding: 2px 7px; border-radius: 5px; margin-bottom: 4px; letter-spacing: 0.02em; }
 .tpl-badge { display: inline-block; font-size: 10px; font-weight: 700; color: #c4b5fd; background: rgba(139,92,246,0.18); padding: 2px 7px; border-radius: 5px; margin-bottom: 4px; letter-spacing: 0.02em; }
 .deeplink-badge { display: inline-block; font-size: 10px; font-weight: 700; color: #86efac; background: rgba(62,207,142,0.18); padding: 2px 7px; border-radius: 5px; margin-bottom: 4px; letter-spacing: 0.02em; }
-#selectRoutineList { max-height: 400px; overflow-y: auto; scroll-behavior: smooth; }
+.routine-scroll-wrap { position: relative; }
+.routine-scroll-wrap::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 48px;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none; border-radius: 0 0 12px 12px;
+  transition: opacity 0.2s;
+}
+.routine-scroll-wrap.no-overflow::after { opacity: 0; }
+
+#selectRoutineList { max-height: 400px; overflow-y: auto; scroll-behavior: smooth; padding-bottom: 8px; }
 #selectRoutineList::-webkit-scrollbar { width: 3px; }
 #selectRoutineList::-webkit-scrollbar-track { background: transparent; }
-#selectRoutineList::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+#selectRoutineList::-webkit-scrollbar-thumb { background: rgba(94,196,170,0.3); border-radius: 2px; }
+
+.select-section-divider {
+  height: 1px; background: var(--border); margin: 16px 0;
+}
 .ex-drag-handle { font-size: 14px; color: var(--muted); opacity: 0.5; }
 
 /* ── 플래너 탭 ──────────────────────────────────────── */

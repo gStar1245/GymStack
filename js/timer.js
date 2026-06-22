@@ -97,6 +97,7 @@ const Timer = (() => {
 
   function _renderSelectRoutines() {
     const list = document.getElementById('selectRoutineList');
+    const wrap = list.closest('.routine-scroll-wrap');
     const routines = Routines.getAll();
     const lastId = Settings.lastRoutineId;
     list.innerHTML = '';
@@ -107,6 +108,12 @@ const Timer = (() => {
       if (r.id === lastId) item.classList.add('last-used');
       list.appendChild(item);
     });
+    requestAnimationFrame(() => {
+      if (wrap) wrap.classList.toggle('no-overflow', list.scrollHeight <= list.clientHeight);
+    });
+    list.addEventListener('scroll', () => {
+      if (wrap) wrap.classList.toggle('no-overflow', list.scrollTop + list.clientHeight >= list.scrollHeight - 4);
+    }, { passive: true });
   }
 
   function _renderSelectTemplates() {
