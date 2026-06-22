@@ -104,6 +104,17 @@ const App = (() => {
     Timer.showSelectView();
 
     switchTab('timer');
+
+    // URL 딥링크: ?r=BASE64(JSON) → 루틴 자동 로드
+    const r = new URLSearchParams(location.search).get('r');
+    if (r) {
+      try {
+        const routine = JSON.parse(atob(r));
+        if (Array.isArray(routine.exercises) && routine.label) {
+          Timer.startSession(routine.exercises, routine.label);
+        }
+      } catch {}
+    }
   }
 
   function applyTheme(t) {

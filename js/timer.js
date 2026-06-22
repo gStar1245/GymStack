@@ -247,7 +247,7 @@ const TimerUI = (() => {
 
     if (s.resting) {
       card.className = 'current-ex-card';
-      label.textContent = s.pendingNext !== -1 ? '종목 완료 · 탭하면 스킵' : '탭하면 스킵';
+      label.textContent = s.pendingNext !== -1 ? '휴식 중 · 탭하면 스킵' : '탭하면 스킵';
       display.textContent = s.restRemaining + '초';
       display.className = 'timer-display resting';
       prog.style.display = 'block';
