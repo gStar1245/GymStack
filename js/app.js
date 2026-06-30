@@ -105,11 +105,11 @@ const App = (() => {
 
     switchTab('timer');
 
-    // URL 딥링크: ?r=BASE64(JSON) → 루틴 자동 로드
+    // URL 딥링크: ?r=encodeURIComponent(JSON) → 루틴 자동 로드
     const r = new URLSearchParams(location.search).get('r');
     if (r) {
       try {
-        const routine = JSON.parse(atob(r));
+        const routine = JSON.parse(r);
         if (Array.isArray(routine.exercises) && routine.label) {
           Timer.startSession(routine.exercises, routine.label);
         }
